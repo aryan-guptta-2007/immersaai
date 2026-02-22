@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String?   @unique
+  role          String    @default("USER") // ADMIN or USER
+  status        String    @default("ACTIVE") // ACTIVE or SUSPENDED
+  createdAt     DateTime  @default(now())
+  
+  generations   Generation[]
+  payments      Payment[]
+}
+
+model Generation {
+  id            String    @id @default(cuid())
+  prompt        String
+  theme         String
+  content       String    // Stored as JSON string
+  userId        String?
+  createdAt     DateTime  @default(now())
+  
+  user          User?     @relation(fields: [userId], references: [id])
+}
+
+model Payment {
+  id            String    @id @default(cuid())
+  orderId       String    @unique
+  amount        Int       // Stored in paise/cents
+  tier          String    // Student, Creator, Agency
+  status        String    @default("PENDING") // PENDING, SUCCESS, FAILED
+  userId        String?
+  createdAt     DateTime  @default(now())
+
+  user          User?     @relation(fields: [userId], references: [id])
+}
