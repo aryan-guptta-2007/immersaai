@@ -10,6 +10,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
   const [brandContext, setBrandContext] = useState<BrandContext | null>(null);
+  const [generationId, setGenerationId] = useState<string | null>(null);
 
   const handleGenerate = async (prompt: string) => {
     setIsGenerating(true);
@@ -25,6 +26,7 @@ export default function Home() {
 
       const data = await response.json();
       setBrandContext(data);
+      setGenerationId(data.id); // Assuming the API returns the DB ID
       setGeneratedPrompt(prompt);
     } catch (error) {
       console.error(error);
@@ -37,6 +39,7 @@ export default function Home() {
   const handleRegenerate = () => {
     setGeneratedPrompt(null);
     setBrandContext(null);
+    setGenerationId(null);
   };
 
   const handleRegenerateStyle = (theme: BrandContext['theme']) => {
@@ -101,6 +104,7 @@ export default function Home() {
             key="preview"
             prompt={generatedPrompt}
             brandContext={brandContext}
+            generationId={generationId || undefined}
             onRegenerate={handleRegenerate}
             onRegenerateStyle={handleRegenerateStyle}
           />

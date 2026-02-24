@@ -17,11 +17,12 @@ export interface BrandContext {
 interface PreviewCanvasProps {
     prompt: string;
     brandContext: BrandContext;
+    generationId?: string;
     onRegenerate: () => void;
     onRegenerateStyle: (theme: BrandContext['theme']) => void;
 }
 
-export function PreviewCanvas({ prompt, brandContext, onRegenerate, onRegenerateStyle }: PreviewCanvasProps) {
+export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate, onRegenerateStyle }: PreviewCanvasProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [showPricing, setShowPricing] = useState(false);
@@ -62,6 +63,7 @@ export function PreviewCanvas({ prompt, brandContext, onRegenerate, onRegenerate
                 isOpen={showPricing}
                 onClose={() => setShowPricing(false)}
                 actionType={pricingAction}
+                generationId={generationId}
             />
             <ShareModal
                 isOpen={showShare}

@@ -24,6 +24,8 @@ model Generation {
   theme         String
   content       String    // Stored as JSON string
   userId        String?
+  paymentStatus String    @default("PENDING") // PENDING, SUBMITTED, SUCCESS
+  upiTxnId      String?
   createdAt     DateTime  @default(now())
   
   user          User?     @relation(fields: [userId], references: [id])

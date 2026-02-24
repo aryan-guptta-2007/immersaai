@@ -1,6 +1,7 @@
 import prisma from "@/lib/db";
 import { format } from "date-fns";
 import { CreditCard, Zap, Users as UsersIcon } from "lucide-react";
+import { PendingPaymentsTable } from "@/components/PendingPaymentsTable";
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,18 @@ export default async function AdminDashboard() {
     const recentGenerations = await prisma.generation.findMany({
         take: 5,
         orderBy: { createdAt: 'desc' }
+    });
+
+    // Pending Payments
+    const pendingPayments = await prisma.generation.findMany({
+        where: { paymentStatus: 'SUBMITTED' },
+        orderBy: { createdAt: 'desc' },
+        select: {
+            id: true,
+            prompt: true,
+            upiTxnId: true,
+            paymentStatus: true
+        }
     });
 
     return (
@@ -54,6 +67,8 @@ export default async function AdminDashboard() {
                     </p>
                 </div>
             </div>
+
+            <PendingPaymentsTable generations={pendingPayments} />
 
             {/* Recent Activity Table */}
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 overflow-hidden">
