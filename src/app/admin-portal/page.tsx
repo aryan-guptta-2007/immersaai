@@ -21,15 +21,18 @@ export default async function AdminDashboard() {
         orderBy: { createdAt: 'desc' }
     });
 
-    // Pending Payments
+    // Pending Payments (Now includes both states for filtering)
     const pendingPayments = await prisma.generation.findMany({
-        where: { paymentStatus: 'SUBMITTED' },
+        where: {
+            paymentStatus: { in: ['SUBMITTED', 'SUCCESS'] }
+        },
         orderBy: { createdAt: 'desc' },
         select: {
             id: true,
             prompt: true,
             upiTxnId: true,
-            paymentStatus: true
+            paymentStatus: true,
+            createdAt: true
         }
     });
 

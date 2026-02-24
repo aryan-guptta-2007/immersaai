@@ -7,11 +7,10 @@ export async function POST(req: Request) {
     try {
         const { generationId, upiTxnId, tier } = await req.json();
 
-        if (!generationId || !upiTxnId) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        if (!generationId || !upiTxnId || upiTxnId.length < 10) {
+            return NextResponse.json({ error: 'Invalid UPI Transaction ID. Must be at least 10 characters.' }, { status: 400 });
         }
 
-        // We only allow transition from PENDING -> SUBMITTED to prevent overwrites
         const generation = await prisma.generation.findUnique({
             where: { id: generationId }
         });
@@ -20,8 +19,16 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Generation not found' }, { status: 404 });
         }
 
-        if (generation.paymentStatus === 'SUCCESS') {
-            return NextResponse.json({ error: 'Already paid' }, { status: 400 });
+        // 1. Fraud Protection: Cannot resubmit if already SUBMITTED or SUCCESS
+        if (generation.paymentStatus !== 'PENDING') {
+            return NextResponse.json({ error: 'This generation has already been submitted for payment or is already approved.' }, { status: 400 });
+        }
+
+        // 2. Expiry Protection: 24-hour limit
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+        if (new Date().getTime() - new Date(generation.createdAt).getTime() > ONE_DAY_MS) {
+            // We can pass a specific error code so the frontend knows to trigger a regenerate flow
+            return NextResponse.json({ error: 'EXPIRED', message: 'This generation link has expired (24h limit). Please regenerate.' }, { status: 400 });
         }
 
         // Update the generation record indicating UPI is submitted for admin review

@@ -53,18 +53,18 @@ export function PricingModal({ isOpen, onClose, actionType, generationId }: Pric
                 })
             });
 
+            const data = await res.json();
+
             if (!res.ok) {
-                const data = await res.json();
+                if (data.error === 'EXPIRED') {
+                    alert("⚠️ This generation link has expired (24h limit) to maintain system hygiene. Please click Regenerate to continue.");
+                    onClose();
+                    return;
+                }
                 throw new Error(data.error || "Submission failed");
             }
 
-            setSuccessMessage("Payment submitted securely. Our admin will verify your transaction shortly and unlock your generation.");
-            setTimeout(() => {
-                onClose();
-                setSelectedTier(null);
-                setUpiTxnId("");
-                setSuccessMessage("");
-            }, 5000);
+            setSuccessMessage("SUCCESS");
         } catch (error: any) {
             console.error(error);
             alert(`Error: ${error.message}`);
@@ -184,12 +184,16 @@ export function PricingModal({ isOpen, onClose, actionType, generationId }: Pric
                                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-lg bg-primary/20 blur-[100px] rounded-full pointer-events-none" />
 
                                 {successMessage ? (
-                                    <div className="text-center py-12">
-                                        <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary/30">
-                                            <Check className="w-8 h-8 text-primary" />
+                                    <div className="text-center py-12 px-6">
+                                        <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary/30 shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                                            <Check className="w-10 h-10 text-primary" />
                                         </div>
-                                        <h2 className="text-2xl font-bold mb-4">Verification Pending</h2>
-                                        <p className="text-white/60">{successMessage}</p>
+                                        <h2 className="text-3xl font-bold mb-4">Payment Under Review</h2>
+                                        <p className="text-white/80 text-lg mb-2">Approval typically takes 5–30 minutes.</p>
+                                        <p className="text-white/60 mb-8">You will receive access to your unlock once approved by our team.</p>
+                                        <button onClick={onClose} className="py-2.5 px-6 rounded-xl bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium border border-white/20">
+                                            Return to Dashboard
+                                        </button>
                                     </div>
                                 ) : (
                                     <div className="w-full max-w-md mx-auto relative z-10">
