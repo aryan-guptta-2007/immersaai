@@ -206,16 +206,16 @@ export function PricingModal({ isOpen, onClose, actionType, generationId }: Pric
                                         </div>
 
                                         <div className="bg-white p-4 rounded-2xl aspect-square mb-8 mx-auto w-48 flex items-center justify-center relative overflow-hidden group">
-                                            {/* Dummy QR placeholder - Instruct user to replace with their actual QR */}
-                                            <div className="absolute inset-0 bg-gray-100 flex flex-col items-center justify-center text-black">
-                                                <QrCode className="w-20 h-20 mb-2 opacity-80" />
-                                                <p className="text-[10px] font-bold text-center px-4 uppercase opacity-50">PLACE YOUR UPI QR HERE</p>
-                                            </div>
+                                            <img
+                                                src="/upi-qr.png"
+                                                alt="UPI QR Code"
+                                                className="w-full h-full object-contain"
+                                            />
                                         </div>
 
                                         <div className="text-center mb-8">
                                             <div className="text-sm text-white/40 uppercase tracking-widest mb-1">UPI ID</div>
-                                            <div className="text-xl font-mono text-primary-glow">founder@upi</div>
+                                            <div className="text-xl font-mono text-primary-glow">7852826909@mbk</div>
                                         </div>
 
                                         <form onSubmit={handleSubmitUpi} className="space-y-4">
