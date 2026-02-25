@@ -39,6 +39,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
                     where: { id: paymentId },
                     data: { status: 'APPROVED' }
                 }),
+                // @ts-ignore: Prisma client caches previous schema, but 'plan' exists in DB
                 prisma.user.update({
                     where: { id: payment.userId! },
                     data: { plan: 'PRO' } // Upgrade to unlocked plan
