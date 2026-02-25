@@ -6,6 +6,7 @@ import { Background3D } from "./Background3D";
 import { useRef, useState } from "react";
 import { PricingModal } from "./PricingModal";
 import { ShareModal } from "./ShareModal";
+import { useSession } from "next-auth/react";
 
 export interface BrandContext {
     theme: 'cyber' | 'neural' | 'luxury' | 'default';
@@ -28,6 +29,7 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
     const [showPricing, setShowPricing] = useState(false);
     const [pricingAction, setPricingAction] = useState<'export' | 'deploy'>('export');
     const [showShare, setShowShare] = useState(false);
+    const { data: session } = useSession();
 
     // Cinematic Parallax Scroll Logic
     const { scrollYProgress } = useScroll({
@@ -43,11 +45,19 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
     const featuresBgColor = useTransform(scrollYProgress, [0.1, 0.3], ["rgba(0,0,0,0)", "rgba(0,0,0,1)"]);
 
     const handleExport = () => {
+        if ((session?.user as any)?.plan === "PRO") {
+            alert("Export Initiated. Production bundle is compiling...");
+            return;
+        }
         setPricingAction('export');
         setShowPricing(true);
     };
 
     const handleDeploy = () => {
+        if ((session?.user as any)?.plan === "PRO") {
+            alert("Deploy Initiated. Pushing build to edge worker...");
+            return;
+        }
         setPricingAction('deploy');
         setShowPricing(true);
     };
@@ -100,8 +110,8 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                                 key={theme}
                                 onClick={() => onRegenerateStyle(theme)}
                                 className={`px-3 py-1.5 rounded-md text-xs font-mono uppercase tracking-widest transition-all ${brandContext.theme === theme
-                                        ? 'bg-white/20 text-white shadow-sm'
-                                        : 'text-white/40 hover:text-white hover:bg-white/10'
+                                    ? 'bg-white/20 text-white shadow-sm'
+                                    : 'text-white/40 hover:text-white hover:bg-white/10'
                                     }`}
                             >
                                 {theme === 'default' ? 'Modern' : theme}

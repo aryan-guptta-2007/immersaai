@@ -43,24 +43,18 @@ export function PricingModal({ isOpen, onClose, actionType, generationId }: Pric
 
         setIsSubmitting(true);
         try {
-            const res = await fetch("/api/submit-upi", {
+            const res = await fetch("/api/payments/submit", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    generationId,
                     upiTxnId,
-                    tier: selectedTier
+                    planRequested: selectedTier
                 })
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                if (data.error === 'EXPIRED') {
-                    alert("⚠️ This generation link has expired (24h limit) to maintain system hygiene. Please click Regenerate to continue.");
-                    onClose();
-                    return;
-                }
                 throw new Error(data.error || "Submission failed");
             }
 
@@ -121,9 +115,9 @@ export function PricingModal({ isOpen, onClose, actionType, generationId }: Pric
                             </div>
 
                             <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6 bg-black/40">
-                                {/* Student */}
+                                {/* Tier 1 */}
                                 <div className="rounded-2xl border border-white/10 p-6 flex flex-col hover:border-white/20 transition-colors bg-white/5">
-                                    <h3 className="font-medium text-lg mb-1">Student</h3>
+                                    <h3 className="font-medium text-lg mb-1">Access Node: Lite</h3>
                                     <div className="text-3xl font-bold mb-6">₹499<span className="text-sm font-normal text-white/50">/export</span></div>
                                     <ul className="flex-1 space-y-3 mb-6 text-sm text-white/70">
                                         <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> Full Source Code</li>
@@ -131,44 +125,44 @@ export function PricingModal({ isOpen, onClose, actionType, generationId }: Pric
                                         <li className="flex gap-2 opacity-50"><Check className="w-4 h-4 text-primary shrink-0" /> ImmersaAI Watermark</li>
                                     </ul>
                                     <button
-                                        onClick={() => handleSelectTier('Student')}
+                                        onClick={() => handleSelectTier('PRO')}
                                         className="w-full py-2.5 rounded-xl border border-white/10 hover:bg-white/10 font-medium transition-colors text-sm flex items-center justify-center gap-2"
                                     >
-                                        Select Student
+                                        Initialize Node
                                     </button>
                                 </div>
 
-                                {/* Creator */}
+                                {/* Tier 2 */}
                                 <div className="rounded-2xl border border-primary/50 relative p-6 flex flex-col bg-primary/5">
                                     <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Most Popular</div>
-                                    <h3 className="font-medium text-lg mb-1 text-primary-glow">Creator</h3>
+                                    <h3 className="font-medium text-lg mb-1 text-primary-glow">Creator Engine</h3>
                                     <div className="text-3xl font-bold mb-6">₹999<span className="text-sm font-normal text-white/50">/export</span></div>
                                     <ul className="flex-1 space-y-3 mb-6 text-sm text-white/90">
-                                        <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> Everything in Student</li>
+                                        <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> Everything in Lite</li>
                                         <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> Premium 3D Environments</li>
                                         <li className="flex gap-2"><Sparkles className="w-4 h-4 text-primary shrink-0" /> No Watermark</li>
                                     </ul>
                                     <button
-                                        onClick={() => handleSelectTier('Creator')}
+                                        onClick={() => handleSelectTier('PRO')}
                                         className="w-full py-2.5 rounded-xl bg-white text-black font-semibold hover:bg-white/90 transition-colors text-sm flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                                     >
-                                        Select Creator
+                                        Select Engine
                                     </button>
                                 </div>
 
-                                {/* Agency */}
+                                {/* Tier 3 */}
                                 <div className="rounded-2xl border border-white/10 p-6 flex flex-col hover:border-white/20 transition-colors bg-white/5">
-                                    <h3 className="font-medium text-lg mb-1">Agency Pro</h3>
+                                    <h3 className="font-medium text-lg mb-1">Enterprise Neural Stack</h3>
                                     <div className="text-3xl font-bold mb-6">₹2999<span className="text-sm font-normal text-white/50">/export</span></div>
                                     <ul className="flex-1 space-y-3 mb-6 text-sm text-white/70">
                                         <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> Multi-Domain Deploy</li>
                                         <li className="flex gap-2"><Check className="w-4 h-4 text-primary shrink-0" /> Commercial Resell License</li>
                                     </ul>
                                     <button
-                                        onClick={() => handleSelectTier('Agency')}
+                                        onClick={() => handleSelectTier('PRO')}
                                         className="w-full py-2.5 rounded-xl border border-white/10 hover:bg-white/10 font-medium transition-colors text-sm flex items-center justify-center gap-2"
                                     >
-                                        Select Agency
+                                        Unlock Matrix
                                     </button>
                                 </div>
                             </div>

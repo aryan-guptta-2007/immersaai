@@ -16,6 +16,15 @@ export const authOptions: AuthOptions = {
     session: {
         strategy: "database",
     },
+    callbacks: {
+        session: async ({ session, user }) => {
+            if (session?.user && user) {
+                (session.user as any).id = user.id;
+                (session.user as any).plan = (user as any).plan;
+            }
+            return session;
+        }
+    }
 };
 
 const handler = NextAuth(authOptions);
