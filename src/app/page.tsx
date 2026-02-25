@@ -41,177 +41,214 @@ export default function MarketingPage() {
                 </div>
             </nav>
 
-            {/* Hero Section */}
-            <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 flex flex-col items-center text-center">
+            {/* System Engine UI - Layer 1 & 2 */}
+            <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+                {/* Layer 1: Living Canvas */}
                 <HeroBackground />
 
+                {/* Layer 2: Holographic Command Center */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="relative z-10 max-w-5xl mx-auto"
+                    initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative z-10 w-full max-w-4xl flex flex-col items-center"
                 >
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-white/10 text-sm font-medium mb-8">
-                        <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-                        <span className="text-white/80 tracking-wide font-medium">ImmersaAI Engine v2.0 Active</span>
+                    {/* Status Indicator */}
+                    <div className="flex items-center gap-3 mb-10 bg-black/40 backdrop-blur-xl border border-white/10 px-6 py-2 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+                        <div className="relative flex h-3 w-3">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                        </div>
+                        <span className="text-sm font-mono tracking-widest text-white/70 uppercase">ImmersaAI System Online</span>
                     </div>
 
-                    <motion.h1
-                        className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 leading-[1.05]"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1, ease: "easeOut" }}
-                    >
-                        <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-white/30 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
-                            AI cinematic brand
-                        </span>
-                        <br />
-                        <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-[0_0_40px_rgba(129,140,248,0.3)]">
-                            experience engine.
-                        </span>
-                    </motion.h1>
+                    {/* Main Holographic Terminal */}
+                    <div className="w-full glass-panel border border-white/10 rounded-3xl p-2 relative shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
 
-                    <p className="text-xl md:text-2xl text-white/50 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
-                        Prompt to an agency-level 3D website in seconds. Built for founders, creators, and brands who refuse to look like everyone else.
-                    </p>
+                        {/* Terminal Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/[0.02]">
+                            <div className="flex gap-2">
+                                <div className="w-3 h-3 rounded-full bg-red-500/50" />
+                                <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
+                                <div className="w-3 h-3 rounded-full bg-green-500/50" />
+                            </div>
+                            <div className="text-xs font-mono text-white/30 uppercase tracking-widest">A.I. Generation Node</div>
+                            <Sparkles className="w-4 h-4 text-white/30" />
+                        </div>
 
-                    <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 relative z-20">
-                        <Link
-                            href="/engine"
-                            className="group flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/90 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all duration-300"
-                        >
-                            <Sparkles className="w-4 h-4 text-primary" />
-                            Enter the Engine
-                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                        <a
-                            href="#showcase"
-                            className="px-8 py-4 rounded-full glass-panel text-white font-medium text-lg border border-white/10 hover:border-white/30 hover:bg-white/10 transition-colors duration-300"
-                        >
-                            View Examples
-                        </a>
+                        {/* Terminal Body */}
+                        <div className="p-8 md:p-12 flex flex-col items-center text-center">
+                            <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50 drop-shadow-2xl">
+                                Enter your vision.
+                            </h1>
+                            <p className="text-lg text-white/40 font-light max-w-xl mx-auto mb-10">
+                                Connect to the engine. Describe the brand, product, or cinematic experience you want to manifest into WebGL reality.
+                            </p>
+
+                            {/* Interactive Prompt Box */}
+                            <div className="w-full relative group">
+                                <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-accent/30 rounded-2xl blur-lg opacity-50 group-hover:opacity-100 transition duration-500" />
+                                <div className="relative glass-panel border border-white/20 rounded-2xl flex items-center p-2 bg-black/60 backdrop-blur-2xl transition-all duration-300 group-hover:bg-black/80 group-hover:border-white/40">
+                                    <div className="pl-6 pr-4 border-r border-white/10 hidden sm:block">
+                                        <Code2 className="w-5 h-5 text-primary" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. A neon-lit cyberpunk startup selling quantum..."
+                                        className="flex-1 bg-transparent border-none text-white px-6 py-4 outline-none placeholder:text-white/20 text-lg w-full"
+                                        readOnly // Placeholder behavior until JS activates on real engine route
+                                        onClick={() => window.location.href = '/engine'}
+                                    />
+                                    <Link href="/engine" className="ml-2 bg-white text-black px-6 py-4 rounded-xl font-bold uppercase tracking-wide text-sm hover:bg-white/90 hover:scale-[1.02] transition-all flex items-center gap-2">
+                                        Initialize <ArrowRight className="w-4 h-4" />
+                                    </Link>
+                                </div>
+                            </div>
+
+                            {/* System Stats / Config Mock */}
+                            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-white/40">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-green-500/50" />
+                                    Node: US-EAST-1
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-blue-500/50" />
+                                    Model: GPT-4.5 Core
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-purple-500/50" />
+                                    Renderer: WebGL 2.0
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </motion.div>
+
+                {/* Down Arrow Hint */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 2, duration: 1 }}
+                    className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30"
+                >
+                    <span className="text-xs font-mono tracking-widest uppercase">System Logs</span>
+                    <div className="w-px h-12 bg-gradient-to-b from-white/30 to-transparent" />
                 </motion.div>
             </section>
 
-            {/* THE TRUST ENGINE: Showcase Section */}
-            <section id="showcase" className="py-24 px-6 border-t border-white/5 relative bg-black/80">
+            {/* Layer 2: System Architecture / Control Panels */}
+            <section id="architecture" className="py-32 px-6 relative bg-black border-t border-white/10">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,_var(--tw-gradient-stops))] from-primary/5 via-black to-black pointer-events-none" />
+
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">World-Class Output.</h2>
-                        <p className="text-white/50 max-w-2xl mx-auto text-lg">Stop using templates. Generate bespoke, interactive WebGL experiences customized to your exact niche instantaneously.</p>
+                    <div className="flex flex-col md:flex-row gap-12 items-start">
+                        {/* Left Column: System Status */}
+                        <div className="w-full md:w-1/3 flex flex-col gap-6 sticky top-32">
+                            <div className="text-xs font-mono text-primary tracking-widest uppercase mb-2">System Architecture</div>
+                            <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+                                Not a template. <br className="hidden md:block" />
+                                <span className="text-white/40">A generative matrix.</span>
+                            </h2>
+                            <p className="text-white/50 leading-relaxed mb-8">
+                                Standard platforms give you pre-built components. ImmersaAI allocates dedicated cloud rendering nodes to synthesize bespoke WebGL geometry on the fly.
+                            </p>
+
+                            <div className="glass-panel border border-white/10 rounded-2xl p-6 bg-white/[0.02]">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div className="text-sm font-mono text-white/50">Core Metrics</div>
+                                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                </div>
+                                <div className="space-y-4 font-mono text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="text-white/40">Geometry Generation</span>
+                                        <span className="text-white">1.2s</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-white/40">Shader Compilation</span>
+                                        <span className="text-white">0.8s</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-white/40">Copywriting Node</span>
+                                        <span className="text-white">Active</span>
+                                    </div>
+                                    <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-4">
+                                        <div className="w-full h-full bg-primary/50 relative">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent w-1/2 animate-[shimmer_2s_infinite]" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Column: Holographic Panels */}
+                        <div className="w-full md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                            {/* Panel 1 */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                className="glass-panel border border-white/10 p-1 flex flex-col rounded-3xl bg-black/50 overflow-hidden group hover:border-white/30 transition-all duration-500"
+                            >
+                                <div className="h-48 bg-zinc-950 rounded-2xl m-2 overflow-hidden relative flex items-center justify-center border border-white/5">
+                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black" />
+                                    <div className="absolute inset-0 opacity-20 bg-[linear-gradient(rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:2rem_2rem]" />
+                                    <Globe className="w-12 h-12 text-blue-500/50 group-hover:scale-110 group-hover:text-blue-400 transition-all duration-700" />
+                                </div>
+                                <div className="p-6 pt-4">
+                                    <div className="text-xs font-mono text-white/30 mb-2 uppercase">[ Detected Environment ]</div>
+                                    <h3 className="text-2xl font-bold mb-2">Spatial Context <br /> Mapping</h3>
+                                    <p className="text-white/50 text-sm leading-relaxed">The engine reads your prompt's industry and automatically constructs corresponding 3D lightmaps, HDRI reflections, and physics settings.</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Panel 2 */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                transition={{ delay: 0.1 }}
+                                className="glass-panel border border-white/10 p-1 flex flex-col rounded-3xl bg-black/50 overflow-hidden group hover:border-white/30 transition-all duration-500"
+                            >
+                                <div className="h-48 bg-zinc-950 rounded-2xl m-2 overflow-hidden relative flex items-center justify-center border border-white/5">
+                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-fuchsia-900/20 via-black to-black" />
+                                    <Sparkles className="w-12 h-12 text-fuchsia-500/50 group-hover:scale-110 group-hover:text-fuchsia-400 transition-all duration-700" />
+                                </div>
+                                <div className="p-6 pt-4">
+                                    <div className="text-xs font-mono text-white/30 mb-2 uppercase">[ Content Synthesis ]</div>
+                                    <h3 className="text-2xl font-bold mb-2">Automated <br /> Copywriting</h3>
+                                    <p className="text-white/50 text-sm leading-relaxed">No lorem ipsum. The AI writes high-converting, brand-aligned headlines and paragraphs mapped precisely to the generated UI layout.</p>
+                                </div>
+                            </motion.div>
+
+                            {/* Panel 3 - Wide */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-100px" }}
+                                className="glass-panel border border-white/10 p-1 flex flex-col rounded-3xl bg-black/50 overflow-hidden group hover:border-white/30 transition-all duration-500 md:col-span-2"
+                            >
+                                <div className="h-40 bg-zinc-950 rounded-2xl m-2 overflow-hidden relative flex items-center justify-center border border-white/5">
+                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/10 via-black to-black" />
+                                    <div className="flex gap-4 items-center">
+                                        <div className="px-4 py-2 border border-white/10 rounded-lg bg-white/5 font-mono text-xs text-white/50">Next.js</div>
+                                        <div className="w-8 h-px bg-white/20" />
+                                        <div className="px-4 py-2 border border-white/10 rounded-lg bg-white/5 font-mono text-xs text-white/50">Three.js</div>
+                                        <div className="w-8 h-px bg-white/20" />
+                                        <div className="px-4 py-2 border border-white/10 rounded-lg bg-white/5 font-mono text-xs text-white/50">Tailwind</div>
+                                    </div>
+                                </div>
+                                <div className="p-6 pt-4 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div>
+                                        <div className="text-xs font-mono text-white/30 mb-2 uppercase">[ Extraction Protocol ]</div>
+                                        <h3 className="text-2xl font-bold mb-2">Production Export</h3>
+                                        <p className="text-white/50 text-sm leading-relaxed max-w-md">Download instantly deployable root directories. Clean, modern, heavily optimized React code with dynamic imports and SSR disabled for Canvas.</p>
+                                    </div>
+                                    <Code2 className="w-10 h-10 text-white/20 hidden md:block" />
+                                </div>
+                            </motion.div>
+                        </div>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Example 1: Cyber */}
-                        <div className="group rounded-3xl border border-white/10 bg-white/5 overflow-hidden flex flex-col hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer">
-                            <div className="h-48 w-full relative bg-zinc-950 overflow-hidden flex items-center justify-center p-6">
-                                {/* CSS Mockup of the Canvas */}
-                                <div className="w-full h-full border border-green-500/20 rounded-xl flex items-center justify-center relative overflow-hidden bg-black shadow-[inset_0_0_20px_rgba(34,197,94,0.1)]">
-                                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-green-900/20 via-black to-black"></div>
-                                    <div className="font-mono text-green-500 font-bold text-xl uppercase tracking-widest z-10 text-center drop-shadow-[0_0_10px_rgba(34,197,94,1)]">Zero-Trust</div>
-                                </div>
-                            </div>
-                            <div className="p-6 flex-1 flex flex-col">
-                                <div className="text-xs font-mono text-white/30 mb-2">// PROMPT</div>
-                                <p className="text-sm font-medium text-white/80 mb-6 flex-1">"A stealth cybersecurity startup protecting quantum data centers."</p>
-                                <div className="flex gap-2">
-                                    <span className="px-2 py-1 bg-black/50 border border-white/5 rounded text-xs text-white/50">Cyber Theme</span>
-                                    <span className="px-2 py-1 bg-black/50 border border-white/5 rounded text-xs text-white/50">WebGL Line Mesh</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Example 2: Luxury */}
-                        <div className="group rounded-3xl border border-white/10 bg-white/5 overflow-hidden flex flex-col hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer">
-                            <div className="h-48 w-full relative bg-zinc-900 overflow-hidden flex items-center justify-center p-6">
-                                {/* CSS Mockup of the Canvas */}
-                                <div className="w-full h-full border border-white/10 rounded-xl flex flex-col items-center justify-center relative overflow-hidden bg-zinc-950 shadow-inner">
-                                    <div className="font-serif text-amber-500/80 text-2xl uppercase tracking-[0.3em] font-light z-10 px-4 text-center">Maison</div>
-                                    <div className="h-px w-12 bg-amber-500/40 mt-3 z-10"></div>
-                                </div>
-                            </div>
-                            <div className="p-6 flex-1 flex flex-col">
-                                <div className="text-xs font-mono text-white/30 mb-2">// PROMPT</div>
-                                <p className="text-sm font-medium text-white/80 mb-6 flex-1">"An ultra-luxury Parisian fashion house launching a digital collection."</p>
-                                <div className="flex gap-2">
-                                    <span className="px-2 py-1 bg-black/50 border border-white/5 rounded text-xs text-amber-500/50">Luxury Theme</span>
-                                    <span className="px-2 py-1 bg-black/50 border border-white/5 rounded text-xs text-amber-500/50">Glassmorphism</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Example 3: Neural */}
-                        <div className="group rounded-3xl border border-white/10 bg-white/5 overflow-hidden flex flex-col hover:border-white/20 hover:bg-white/10 transition-all cursor-pointer">
-                            <div className="h-48 w-full relative bg-zinc-950 overflow-hidden flex items-center justify-center p-6">
-                                {/* CSS Mockup of the Canvas */}
-                                <div className="w-full h-full border border-blue-500/20 rounded-xl flex items-center justify-center relative overflow-hidden bg-black shadow-[inset_0_0_30px_rgba(59,130,246,0.1)]">
-                                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-black to-black"></div>
-                                    <div className="font-sans text-white font-bold text-2xl tracking-tighter z-10">Sentient.ai</div>
-                                </div>
-                            </div>
-                            <div className="p-6 flex-1 flex flex-col">
-                                <div className="text-xs font-mono text-white/30 mb-2">// PROMPT</div>
-                                <p className="text-sm font-medium text-white/80 mb-6 flex-1">"The world's first AGI research lab building cognitive architectures."</p>
-                                <div className="flex gap-2">
-                                    <span className="px-2 py-1 bg-black/50 border border-white/5 rounded text-xs text-indigo-300">Neural Theme</span>
-                                    <span className="px-2 py-1 bg-black/50 border border-white/5 rounded text-xs text-indigo-300">Particle Web</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Value Drivers */}
-            <section className="py-24 px-6 border-y border-white/5 relative bg-black/50">
-                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="flex flex-col gap-4"
-                    >
-                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                            <Sparkles className="w-6 h-6 text-primary" />
-                        </div>
-                        <h3 className="text-2xl font-semibold">Brand Intelligence</h3>
-                        <p className="text-white/50 leading-relaxed">
-                            Our engine understands your prompt's context and instantly generates bespoke copy, 3D assets, and layouts matched to your industry.
-                        </p>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                        className="flex flex-col gap-4"
-                    >
-                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                            <Code2 className="w-6 h-6 text-accent" />
-                        </div>
-                        <h3 className="text-2xl font-semibold">Export Production Code</h3>
-                        <p className="text-white/50 leading-relaxed">
-                            No generic templates. Get a Next.js + Framer Motion + Three.js codebase that feels custom-built by a top-tier design agency.
-                        </p>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                        className="flex flex-col gap-4"
-                    >
-                        <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
-                            <Globe className="w-6 h-6 text-pink-500" />
-                        </div>
-                        <h3 className="text-2xl font-semibold">Deploy Instantly</h3>
-                        <p className="text-white/50 leading-relaxed">
-                            Push your generated cinematic site directly to a live URL. Capture leads and validate your startup idea in seconds.
-                        </p>
-                    </motion.div>
                 </div>
             </section>
 
