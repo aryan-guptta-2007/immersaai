@@ -38,7 +38,11 @@ export async function POST(req: Request) {
             },
         });
 
-        if (todayCount >= 5) {
+        const user = await prisma.user.findUnique({
+            where: { id: (session.user as any).id }
+        });
+
+        if (user?.plan !== "pro" && todayCount >= 5) {
             return NextResponse.json(
                 { error: "Daily free limit reached. Upgrade to Pro." },
                 { status: 403 }
