@@ -5,34 +5,6 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {
-        // Runtime-only memory store
-        const rateLimitMap =
-            (global as any).__rateLimitMap ||
-            ((global as any).__rateLimitMap = new Map());
-
-        const LIMIT = 5;
-        const WINDOW_MS = 24 * 60 * 60 * 1000;
-
-        const ip = req.headers.get("x-forwarded-for") || "unknown";
-        const now = Date.now();
-
-        const limitRecord = rateLimitMap.get(ip);
-
-        if (limitRecord) {
-            if (now > limitRecord.resetTime) {
-                rateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_MS });
-            } else if (limitRecord.count >= LIMIT) {
-                return NextResponse.json(
-                    { error: "Rate limit exceeded." },
-                    { status: 429 }
-                );
-            } else {
-                limitRecord.count += 1;
-            }
-        } else {
-            rateLimitMap.set(ip, { count: 1, resetTime: now + WINDOW_MS });
-        }
-
         // Runtime imports
         const { PrismaClient } = await import("@prisma/client");
         const prisma = new PrismaClient();
@@ -46,6 +18,32 @@ export async function POST(req: Request) {
         const { getServerSession } = await import("next-auth");
         const { authOptions } = await import("@/app/api/auth/[...nextauth]/route");
         const session = await getServerSession(authOptions);
+
+        if (!session || !session.user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+
+        const todayCount = await prisma.generation.count({
+            where: {
+                userId: (session.user as any).id,
+                createdAt: {
+                    gte: todayStart,
+                },
+            },
+        });
+
+        if (todayCount >= 5) {
+            return NextResponse.json(
+                { error: "Daily free limit reached. Upgrade to Pro." },
+                { status: 403 }
+            );
+        }
 
         const { prompt } = await req.json();
 

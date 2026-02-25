@@ -22,7 +22,15 @@ export default function Home() {
         body: JSON.stringify({ prompt }),
       });
 
-      if (!response.ok) throw new Error('Generation failed');
+      if (!response.ok) {
+        if (response.status === 403) {
+          const errorData = await response.json();
+          alert(errorData.error || "Free limit reached. Upgrade to Pro.");
+          setIsGenerating(false);
+          return;
+        }
+        throw new Error('Generation failed');
+      }
 
       const data = await response.json();
       setBrandContext(data);
