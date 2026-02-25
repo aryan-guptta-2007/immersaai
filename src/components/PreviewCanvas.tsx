@@ -75,64 +75,74 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                 initial={{ y: -50, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
-                className="glass-panel sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-white/10"
+                className="bg-black/90 backdrop-blur-xl sticky top-0 z-50 px-4 py-3 flex items-center justify-between border-b border-white/10 shadow-2xl"
             >
-                <div className="flex items-center gap-4">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                        <div className="w-4 h-4 rounded-sm bg-primary blur-[2px]" />
+                {/* Left Side: System Context */}
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-3 pr-6 border-r border-white/10">
+                        <div className="w-6 h-6 rounded-md bg-white flex items-center justify-center">
+                            <div className="w-3 h-3 rounded-sm bg-black" />
+                        </div>
+                        <span className="text-sm font-bold tracking-tight uppercase text-white">SYS._NODE</span>
                     </div>
-                    <div>
-                        <h2 className="text-sm font-medium text-white">Generated Project</h2>
-                        <p className="text-xs text-white/50 truncate max-w-[200px] md:max-w-md">"{prompt}"</p>
+                    <div className="hidden md:flex flex-col">
+                        <span className="text-[10px] text-white/40 uppercase font-mono tracking-widest mb-0.5">Active Directive</span>
+                        <span className="text-xs text-white/80 font-mono truncate max-w-[300px]">{prompt}</span>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={onRegenerate}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm text-white"
-                    >
-                        <RefreshCw className="w-4 h-4" />
-                        <span className="hidden md:inline">Regenerate</span>
-                    </button>
-                    <button
-                        onClick={() => setShowShare(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm text-white"
-                    >
-                        <Share2 className="w-4 h-4" />
-                        <span className="hidden md:inline">Share</span>
-                    </button>
-                    <button
-                        onClick={handleExport}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm text-white font-medium"
-                    >
-                        <Download className="w-4 h-4" />
-                        <span className="hidden md:inline">Export Code</span>
-                    </button>
-                    <button
-                        onClick={handleDeploy}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black hover:bg-white/90 transition-colors text-sm font-medium"
-                    >
-                        <Rocket className="w-4 h-4" />
-                        <span className="hidden md:inline">Deploy Live</span>
-                    </button>
+                {/* Right Side: Actions & Theme Config */}
+                <div className="flex items-center gap-4">
+                    {/* Integrated Theme Toggle */}
+                    <div className="hidden lg:flex items-center bg-white/5 rounded-lg p-1 border border-white/10 mr-4">
+                        {(['default', 'cyber', 'luxury', 'neural'] as const).map((theme) => (
+                            <button
+                                key={theme}
+                                onClick={() => onRegenerateStyle(theme)}
+                                className={`px-3 py-1.5 rounded-md text-xs font-mono uppercase tracking-widest transition-all ${brandContext.theme === theme
+                                        ? 'bg-white/20 text-white shadow-sm'
+                                        : 'text-white/40 hover:text-white hover:bg-white/10'
+                                    }`}
+                            >
+                                {theme === 'default' ? 'Modern' : theme}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="h-4 w-px bg-white/10 hidden md:block mr-2" />
+
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={onRegenerate}
+                            title="Reroll Generation"
+                            className="p-2 rounded-md bg-transparent hover:bg-white/10 transition-colors text-white/60 hover:text-white"
+                        >
+                            <RefreshCw className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => setShowShare(true)}
+                            title="Share Node"
+                            className="p-2 rounded-md bg-transparent hover:bg-white/10 transition-colors text-white/60 hover:text-white"
+                        >
+                            <Share2 className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={handleExport}
+                            className="flex items-center gap-2 px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors text-xs text-white font-mono uppercase tracking-widest"
+                        >
+                            <Download className="w-3 h-3" />
+                            <span className="hidden md:inline">Export</span>
+                        </button>
+                        <button
+                            onClick={handleDeploy}
+                            className="flex items-center gap-2 px-3 py-2 rounded-md bg-primary hover:bg-primary/90 transition-colors text-xs text-black font-mono font-bold uppercase tracking-widest shadow-[0_0_15px_rgba(var(--primary-rgb),0.5)]"
+                        >
+                            <Rocket className="w-3 h-3" />
+                            <span className="hidden md:inline">Deploy</span>
+                        </button>
+                    </div>
                 </div>
             </motion.header>
-
-            {/* Style Regeneration Pill Overlay */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.5 }}
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 z-40 glass-panel rounded-full px-2 py-2 flex items-center gap-2 border border-white/10 shadow-2xl"
-            >
-                <span className="text-xs text-white/40 px-3 uppercase tracking-wider font-semibold">Style</span>
-                <div className="h-4 w-px bg-white/10" />
-                <button onClick={() => onRegenerateStyle('cyber')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${brandContext.theme === 'cyber' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>Cyber</button>
-                <button onClick={() => onRegenerateStyle('luxury')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${brandContext.theme === 'luxury' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>Luxury</button>
-                <button onClick={() => onRegenerateStyle('neural')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${brandContext.theme === 'neural' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>Neural</button>
-                <button onClick={() => onRegenerateStyle('default')} className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${brandContext.theme === 'default' ? 'bg-white/20 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'}`}>Modern</button>
-            </motion.div>
 
             <div ref={containerRef} className="flex-1 overflow-y-auto relative no-scrollbar perspective-1000">
                 <section className="relative min-h-[100vh] flex flex-col items-center justify-center text-center px-4">

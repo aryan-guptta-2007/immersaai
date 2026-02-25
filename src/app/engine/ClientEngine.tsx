@@ -83,28 +83,24 @@ export default function Home() {
                 ImmersaAI Engine v1.0
               </motion.div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="text-5xl md:text-7xl font-bold tracking-tight mb-6"
+                className="w-full max-w-4xl mx-auto flex flex-col items-center"
               >
-                Generate cinematic 3D <br className="hidden md:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-pink-500">
-                  websites with AI.
-                </span>
-              </motion.h1>
+                <h1 className="text-4xl md:text-5xl font-mono tracking-tighter mb-4 text-white uppercase">
+                  AI Initialization Node
+                </h1>
 
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="text-lg md:text-xl text-white/50 mb-12 max-w-2xl mx-auto font-light"
-              >
-                Describe your brand, startup, or product. Watch our AI build a premium, interactive WebGL experience in seconds.
-              </motion.p>
+                <p className="text-sm md:text-base font-mono text-white/40 mb-12 max-w-2xl mx-auto uppercase tracking-widest">
+                  {"// Provide brand parameters. System will auto-compile WebGL matrix."}
+                </p>
 
-              <PromptInput onSubmit={handleGenerate} isGenerating={isGenerating} />
+                <div className="w-full">
+                  <PromptInput onSubmit={handleGenerate} isGenerating={isGenerating} />
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         ) : (
