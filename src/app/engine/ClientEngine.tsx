@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Background3D } from "@/components/Background3D";
 import { PromptInput } from "@/components/PromptInput";
 import { PreviewCanvas, BrandContext } from "@/components/PreviewCanvas";
+import { GenerationLoader } from "@/components/GenerationLoader";
 
 export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -97,8 +98,32 @@ export default function Home() {
                   {"// Provide brand parameters. System will auto-compile WebGL matrix."}
                 </p>
 
-                <div className="w-full">
-                  <PromptInput onSubmit={handleGenerate} isGenerating={isGenerating} />
+                <div className="w-full relative min-h-[400px]">
+                  <AnimatePresence mode="wait">
+                    {isGenerating ? (
+                      <motion.div
+                        key="loader"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.5 }}
+                        className="absolute inset-0 w-full"
+                      >
+                        <GenerationLoader />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="input"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.5 }}
+                        className="absolute inset-0 w-full"
+                      >
+                        <PromptInput onSubmit={handleGenerate} isGenerating={false} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </motion.div>
             </div>

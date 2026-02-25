@@ -220,9 +220,13 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
 
                 {/* Footer / Watermark */}
                 <section className="relative py-8 z-20 bg-black flex justify-center">
-                    <span className="text-white/20 text-xs font-mono uppercase tracking-widest flex items-center gap-2">
-                        <Sparkles className="w-3 h-3" /> Built with ImmersaAI
-                    </span>
+                    {/* Watermark for free tiers */}
+                    {(!session?.user || (session.user as any)?.plan !== "PRO") && (
+                        <div className="fixed bottom-6 right-6 z-50 glass-panel px-4 py-2 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl pointer-events-none select-none">
+                            <Sparkles className="w-3 h-3 text-primary" />
+                            <span className="font-mono text-[10px] text-white/80 uppercase tracking-widest">Built with ImmersaAI Engine</span>
+                        </div>
+                    )}
                 </section>
             </div>
         </motion.div>

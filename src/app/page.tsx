@@ -152,6 +152,71 @@ export default function MarketingPage() {
                 </div>
             </section>
 
+            {/* Trust Layer: Logos & Testimonials */}
+            <section className="py-24 px-6 border-t border-white/5 bg-black relative z-20">
+                <div className="max-w-7xl mx-auto">
+                    <div className="text-center mb-10">
+                        <p className="text-xs font-mono text-white/40 tracking-widest uppercase">Active nodes powering builders at</p>
+                    </div>
+                    {/* Logo Strip */}
+                    <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500 mb-20 pointer-events-none">
+                        <div className="text-xl font-bold font-serif text-white/80">Acme Corp</div>
+                        <div className="text-2xl font-black tracking-tighter text-white">NEXUS</div>
+                        <div className="text-xl font-mono text-white/90">SYNERGY_</div>
+                        <div className="text-lg font-bold text-white/70 tracking-widest uppercase">Apex Labs</div>
+                        <div className="text-xl font-semibold italic text-white/80">Stark Industries</div>
+                    </div>
+
+                    {/* Founder Quotes */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Quote 1 */}
+                        <div className="glass-panel p-8 rounded-2xl border border-white/5 bg-black/40 hover:bg-white/[0.02] transition-colors">
+                            <div className="flex gap-1 mb-6">
+                                {[1, 2, 3, 4, 5].map(star => <Sparkles key={star} className="w-3 h-3 text-primary" />)}
+                            </div>
+                            <p className="text-white/70 text-sm leading-relaxed mb-8 font-light italic">"We used to quote $15k and wait 4 weeks for WebGL landing pages to be built. The ImmersaAI engine generates the exact same quality in 10 seconds. It's almost unfair to our competitors."</p>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full bg-blue-900/40 border border-blue-500/20 flex items-center justify-center text-xs font-bold text-blue-400">JD</div>
+                                <div>
+                                    <div className="text-sm font-bold">James D.</div>
+                                    <div className="text-xs text-white/40">Founder, Nexus Agency</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Quote 2 */}
+                        <div className="glass-panel p-8 rounded-2xl border border-white/5 bg-black/40 hover:bg-white/[0.02] transition-colors transform md:-translate-y-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+                            <div className="flex gap-1 mb-6">
+                                {[1, 2, 3, 4, 5].map(star => <Sparkles key={star} className="w-3 h-3 text-primary" />)}
+                            </div>
+                            <p className="text-white/70 text-sm leading-relaxed mb-8 font-light italic">"The spatial context mapping is insane. I typed 'cyberpunk fintech' and the shaders and lighting it chose were mathematically spot on. This isn't a template, it's absolute magic."</p>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full bg-purple-900/40 border border-purple-500/20 flex items-center justify-center text-xs font-bold text-purple-400">SM</div>
+                                <div>
+                                    <div className="text-sm font-bold">Sarah M.</div>
+                                    <div className="text-xs text-white/40">VP Product, Fintech Labs</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Quote 3 */}
+                        <div className="glass-panel p-8 rounded-2xl border border-white/5 bg-black/40 hover:bg-white/[0.02] transition-colors">
+                            <div className="flex gap-1 mb-6">
+                                {[1, 2, 3, 4, 5].map(star => <Sparkles key={star} className="w-3 h-3 text-primary" />)}
+                            </div>
+                            <p className="text-white/70 text-sm leading-relaxed mb-8 font-light italic">"Finally, a 'no-code' tool that actually outputs clean React and Three.js code. No lock-in. Connecting the exported bundle to my Vercel took exactly 2 minutes."</p>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-full bg-green-900/40 border border-green-500/20 flex items-center justify-center text-xs font-bold text-green-400">AK</div>
+                                <div>
+                                    <div className="text-sm font-bold">Alex K.</div>
+                                    <div className="text-xs text-white/40">Indie Hacker @ 10x Builders</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Layer 2: Pipeline UI & Generation Wall */}
             <PipelineGraph />
             <GenerationTicker />
