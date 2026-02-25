@@ -5,10 +5,14 @@ import Link from "next/link";
 import { ArrowRight, Sparkles, Code2, Globe } from "lucide-react";
 import dynamic from "next/dynamic";
 
+import { useSession, signIn, signOut } from "next-auth/react";
+
 // Optmize the heavy 3D canvas out of the SSR bundle for Vercel deployment
 const Background3D = dynamic(() => import('@/components/Background3D').then(mod => mod.Background3D), { ssr: false });
 
 export default function MarketingPage() {
+    const { data: session } = useSession();
+
     return (
         <div className="min-h-screen bg-black text-white selection:bg-primary/30 font-light overflow-x-hidden">
             {/* Navigation */}
@@ -21,6 +25,14 @@ export default function MarketingPage() {
                 </div>
                 <div className="flex items-center gap-6">
                     <Link href="#pricing" className="text-sm text-white/70 hover:text-white transition-colors">Pricing</Link>
+                    {session ? (
+                        <>
+                            <Link href="/dashboard" className="text-sm text-white/70 hover:text-white transition-colors">Dashboard</Link>
+                            <button onClick={() => signOut()} className="text-sm text-white/70 hover:text-white transition-colors">Logout</button>
+                        </>
+                    ) : (
+                        <button onClick={() => signIn('google')} className="text-sm text-white/70 hover:text-white transition-colors">Login</button>
+                    )}
                     <Link href="/engine" className="text-sm bg-white text-black px-4 py-2 rounded-full font-medium hover:bg-white/90 transition-colors">
                         Start Creating
                     </Link>

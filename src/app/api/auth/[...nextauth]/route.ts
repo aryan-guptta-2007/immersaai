@@ -1,12 +1,12 @@
-import NextAuth from "next-auth";
+export const dynamic = "force-dynamic";
+
+import NextAuth, { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/db";
 
-const prisma = new PrismaClient();
-
-const handler = NextAuth({
-    adapter: PrismaAdapter(prisma),
+export const authOptions: AuthOptions = {
+    adapter: PrismaAdapter(prisma) as any,
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -16,6 +16,8 @@ const handler = NextAuth({
     session: {
         strategy: "database",
     },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

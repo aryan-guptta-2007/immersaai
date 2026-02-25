@@ -42,6 +42,11 @@ export async function POST(req: Request) {
             apiKey: process.env.OPENAI_API_KEY!,
         });
 
+        // Auth Check
+        const { getServerSession } = await import("next-auth");
+        const { authOptions } = await import("@/app/api/auth/[...nextauth]/route");
+        const session = await getServerSession(authOptions);
+
         const { prompt } = await req.json();
 
         if (!prompt) {
@@ -69,7 +74,7 @@ export async function POST(req: Request) {
                 prompt,
                 theme: parsed.theme || "default",
                 content: JSON.stringify(parsed),
-                userId: null,
+                userId: (session?.user as any)?.id || null,
             },
         });
 
