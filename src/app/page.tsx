@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Code2, Globe } from "lucide-react";
@@ -11,12 +12,17 @@ import { HeroBackground } from '@/components/HeroAnimations';
 
 // Optmize the heavy 3D canvas out of the SSR bundle for Vercel deployment
 const Background3D = dynamic(() => import('@/components/Background3D').then(mod => mod.Background3D), { ssr: false });
+import { BootLogs } from "@/components/BootLogs";
+import { ScrollStoryBackground } from "@/components/ScrollStoryBackground";
 
 export default function MarketingPage() {
     const { data: session } = useSession();
+    const [prompt, setPrompt] = useState("");
 
     return (
-        <div className="min-h-screen bg-black text-white selection:bg-primary/30 font-light overflow-x-hidden">
+        <div className="min-h-screen bg-black text-white selection:bg-primary/30 font-light overflow-x-hidden relative">
+            <ScrollStoryBackground />
+
             {/* Navigation */}
             <nav className="fixed top-0 w-full z-50 glass-panel border-b border-white/5 px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -44,7 +50,7 @@ export default function MarketingPage() {
             {/* System Engine UI - Layer 1 & 2 */}
             <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
                 {/* Layer 1: Living Canvas */}
-                <HeroBackground />
+                <HeroBackground intensity={Math.min(prompt.length, 50)} />
 
                 {/* Layer 2: Holographic Command Center */}
                 <motion.div
@@ -87,9 +93,15 @@ export default function MarketingPage() {
                             </p>
 
                             {/* Interactive Prompt Box */}
-                            <div className="w-full relative group">
-                                <div className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-accent/30 rounded-2xl blur-lg opacity-50 group-hover:opacity-100 transition duration-500" />
-                                <div className="relative glass-panel border border-white/20 rounded-2xl flex items-center p-2 bg-black/60 backdrop-blur-2xl transition-all duration-300 group-hover:bg-black/80 group-hover:border-white/40">
+                            <div className="w-full relative group z-20">
+                                <motion.div
+                                    className="absolute -inset-1 bg-gradient-to-r from-primary/30 to-accent/30 rounded-2xl blur-lg transition duration-500"
+                                    animate={{
+                                        opacity: prompt.length > 0 ? Math.min(0.5 + prompt.length * 0.02, 1) : 0.2,
+                                        scale: prompt.length > 0 ? 1.02 : 1
+                                    }}
+                                />
+                                <div className="relative glass-panel border border-white/20 rounded-2xl flex items-center p-2 bg-black/60 backdrop-blur-2xl transition-all duration-300 focus-within:bg-black/80 focus-within:border-white/40">
                                     <div className="pl-6 pr-4 border-r border-white/10 hidden sm:block">
                                         <Code2 className="w-5 h-5 text-primary" />
                                     </div>
@@ -97,10 +109,15 @@ export default function MarketingPage() {
                                         type="text"
                                         placeholder="e.g. A neon-lit cyberpunk startup selling quantum..."
                                         className="flex-1 bg-transparent border-none text-white px-6 py-4 outline-none placeholder:text-white/20 text-lg w-full"
-                                        readOnly // Placeholder behavior until JS activates on real engine route
-                                        onClick={() => window.location.href = '/engine'}
+                                        value={prompt}
+                                        onChange={(e) => setPrompt(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                window.location.href = `/engine?q=${encodeURIComponent(prompt)}`;
+                                            }
+                                        }}
                                     />
-                                    <Link href="/engine" className="ml-2 bg-white text-black px-6 py-4 rounded-xl font-bold uppercase tracking-wide text-sm hover:bg-white/90 hover:scale-[1.02] transition-all flex items-center gap-2">
+                                    <Link href={`/engine?q=${encodeURIComponent(prompt)}`} className="ml-2 bg-white text-black px-6 py-4 rounded-xl font-bold uppercase tracking-wide text-sm hover:bg-white/90 hover:scale-[1.02] transition-all flex items-center gap-2">
                                         Initialize <ArrowRight className="w-4 h-4" />
                                     </Link>
                                 </div>
@@ -125,16 +142,10 @@ export default function MarketingPage() {
                     </div>
                 </motion.div>
 
-                {/* Down Arrow Hint */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 2, duration: 1 }}
-                    className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30"
-                >
-                    <span className="text-xs font-mono tracking-widest uppercase">System Logs</span>
-                    <div className="w-px h-12 bg-gradient-to-b from-white/30 to-transparent" />
-                </motion.div>
+                {/* System Boot Logs */}
+                <div className="absolute bottom-6 left-6 md:bottom-12 md:left-12 z-20 pointer-events-none">
+                    <BootLogs />
+                </div>
             </section>
 
             {/* Layer 2: System Architecture / Control Panels */}
@@ -285,14 +296,15 @@ export default function MarketingPage() {
                 <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Tier 1 */}
                     <Link href="/engine" className="glass-panel p-8 rounded-3xl border border-white/10 flex flex-col relative overflow-hidden group hover:border-white/20 transition-colors cursor-pointer text-left block">
-                        <h3 className="text-xl font-medium mb-2">Student Export</h3>
-                        <div className="text-4xl font-bold mb-6">₹499<span className="text-lg text-white/50 font-normal">/export</span></div>
+                        <h3 className="text-xl font-medium mb-2">Student Build</h3>
+                        <div className="text-2xl font-bold mb-2">UNLOCK EXPORT</div>
+                        <div className="text-sm text-white/50 font-mono mb-6">Allocation fee: ₹499</div>
                         <ul className="flex-1 space-y-4 mb-8 text-white/70">
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> Full Source Code</li>
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> Basic 3D Assets</li>
                             <li className="flex items-center gap-3 opacity-50 text-sm">ImmersaAI Watermark</li>
                         </ul>
-                        <span className="block w-full text-center py-3 rounded-xl bg-white/10 group-hover:bg-white/20 font-medium transition-colors">Start Creating</span>
+                        <span className="block w-full text-center py-3 rounded-xl bg-white/10 group-hover:bg-white/20 font-mono text-sm uppercase tracking-widest transition-colors">[ Initialize ]</span>
                     </Link>
 
                     {/* Tier 2 */}
@@ -300,27 +312,29 @@ export default function MarketingPage() {
                         <div className="absolute top-0 right-0 bg-primary text-xs font-bold px-3 py-1 rounded-bl-lg">POPULAR</div>
                         <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
                         <h3 className="text-xl font-medium mb-2 text-primary-glow">Creator License</h3>
-                        <div className="text-4xl font-bold mb-6">₹999<span className="text-lg text-white/50 font-normal">/export</span></div>
+                        <div className="text-2xl font-bold mb-2 text-white">UNLOCK CREATOR MODE</div>
+                        <div className="text-sm text-primary text-opacity-80 font-mono mb-6">Allocation fee: ₹999</div>
                         <ul className="flex-1 space-y-4 mb-8 text-white/90 z-10">
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> Full Source Code</li>
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> Premium 3D Environments</li>
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> 1-Click Vercel Deploy</li>
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> No Watermark</li>
                         </ul>
-                        <span className="block w-full text-center py-3 rounded-xl bg-white text-black font-semibold hover:bg-white/90 transition-colors z-10">Start Creating</span>
+                        <span className="block w-full text-center py-3 rounded-xl bg-white text-black font-mono font-bold uppercase tracking-widest hover:bg-white/90 transition-colors z-10">[ Initialize Mode ]</span>
                     </Link>
 
                     {/* Tier 3 */}
                     <div className="glass-panel p-8 rounded-3xl border border-white/10 flex flex-col relative overflow-hidden group hover:border-white/20 transition-colors">
-                        <h3 className="text-xl font-medium mb-2">Agency Pro</h3>
-                        <div className="text-4xl font-bold mb-6">₹2999<span className="text-lg text-white/50 font-normal">/export</span></div>
+                        <h3 className="text-xl font-medium mb-2">Agency Array</h3>
+                        <div className="text-2xl font-bold mb-2">UNLOCK AGENCY MATRIX</div>
+                        <div className="text-sm text-white/50 font-mono mb-6">Allocation fee: ₹2999</div>
                         <ul className="flex-1 space-y-4 mb-8 text-white/70">
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> Everything in Creator</li>
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> Custom Brand Training</li>
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> Priority API Access</li>
                             <li className="flex items-center gap-3"><Sparkles className="w-4 h-4 text-primary" /> Commercial Resell License</li>
                         </ul>
-                        <button className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 font-medium transition-colors">Contact Sales</button>
+                        <button className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 font-mono uppercase tracking-widest text-sm transition-colors">[ Contact SysAdmin ]</button>
                     </div>
                 </div>
             </section>

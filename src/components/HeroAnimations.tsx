@@ -3,11 +3,15 @@
 import { useEffect, useRef } from "react";
 import { useScroll, useTransform, motion } from "framer-motion";
 
-export function HeroBackground() {
+export function HeroBackground({ intensity = 0 }: { intensity?: number }) {
     const { scrollY } = useScroll();
     const y1 = useTransform(scrollY, [0, 1000], [0, 200]);
     const y2 = useTransform(scrollY, [0, 1000], [0, -200]);
     const opacity = useTransform(scrollY, [0, 500], [1, 0]);
+
+    // Calculate dynamic values strictly based on how long the prompt is
+    const scale = 1 + (intensity * 0.01);
+    const glowOp = 0.2 + (intensity * 0.015);
 
     return (
         <motion.div
@@ -19,25 +23,32 @@ export function HeroBackground() {
 
             {/* Cinematic Ambient Glows */}
             <motion.div
-                className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[150px] mix-blend-screen"
+                className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary blur-[150px] mix-blend-screen"
                 style={{ y: y1 }}
+                animate={{ scale, opacity: glowOp }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
             />
             <motion.div
-                className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-accent/20 blur-[150px] mix-blend-screen"
+                className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-accent blur-[150px] mix-blend-screen"
                 style={{ y: y2 }}
+                animate={{ scale, opacity: glowOp }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
             />
-            <div className="absolute top-[20%] left-[40%] w-[20%] h-[20%] rounded-full bg-white/5 blur-[100px] mix-blend-screen" />
+            <motion.div
+                className="absolute top-[20%] left-[40%] w-[20%] h-[20%] rounded-full bg-white blur-[100px] mix-blend-screen"
+                animate={{ opacity: 0.05 + (intensity * 0.005) }}
+            />
 
             {/* Grid Pattern overlay for tech feel */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
 
             {/* Interactive Cursor Particles */}
-            <CursorParticles />
+            <CursorParticles intensity={intensity} />
         </motion.div>
     );
 }
 
-function CursorParticles() {
+function CursorParticles({ intensity = 0 }: { intensity?: number }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -86,6 +97,25 @@ function CursorParticles() {
             }
         };
         window.addEventListener('mousemove', onMouseMove);
+
+        // Intensity reaction effect
+        let intensityInterval: NodeJS.Timeout;
+        if (intensity > 0) {
+            intensityInterval = setInterval(() => {
+                // Spawn random localized "heat" nodes around the center
+                if (Math.random() < (intensity * 0.05)) {
+                    particles.push({
+                        x: window.innerWidth / 2 + (Math.random() - 0.5) * 600,
+                        y: window.innerHeight / 2 + (Math.random() - 0.5) * 400,
+                        vx: (Math.random() - 0.5) * 5,
+                        vy: (Math.random() - 0.5) * 5,
+                        size: Math.random() * 4 + 2,
+                        life: 0,
+                        maxLife: Math.random() * 30 + 30
+                    });
+                }
+            }, 100);
+        }
 
         // Animation Loop
         let animationFrameId: number;
