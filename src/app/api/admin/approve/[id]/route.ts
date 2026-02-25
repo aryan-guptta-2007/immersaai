@@ -6,7 +6,9 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 export async function POST(req: Request, { params }: { params: { id: string } }) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session?.user) {
+        const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
+        if (!session?.user || session.user.email !== adminEmail) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 

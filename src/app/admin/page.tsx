@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Check, X, Clock, RefreshCw } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface Payment {
     id: string;
@@ -21,6 +23,22 @@ export default function AdminDashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [isActioning, setIsActioning] = useState<string | null>(null);
 
+    const { data: session, status } = useSession();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (status === "loading") return;
+
+        const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
+        if (!session?.user?.email || session.user.email !== adminEmail) {
+            router.push("/");
+            return;
+        }
+
+        fetchPayments();
+    }, [session, status, router]);
+
     const fetchPayments = async () => {
         setIsLoading(true);
         try {
@@ -36,9 +54,20 @@ export default function AdminDashboard() {
         }
     };
 
-    useEffect(() => {
-        fetchPayments();
-    }, []);
+    const fetchPayments = async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch("/api/admin/payments");
+            const data = await res.json();
+            if (data.payments) {
+                setPayments(data.payments);
+            }
+        } catch (error) {
+            console.error("Failed to fetch payments", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleAction = async (id: string, action: 'APPROVE' | 'REJECT') => {
         if (!confirm(`Are you sure you want to ${action} this payment?`)) return;

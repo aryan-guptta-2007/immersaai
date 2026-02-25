@@ -5,10 +5,11 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function GET(req: Request) {
     try {
-        // In a real production app, verify session.user.role === 'ADMIN'
-        // Skipping strict auth for this demo admin panel, but enforcing login
+        // Strict auth for admin panel
         const session = await getServerSession(authOptions);
-        if (!session?.user) {
+        const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+
+        if (!session?.user || session.user.email !== adminEmail) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
