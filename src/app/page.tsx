@@ -7,6 +7,8 @@ import dynamic from "next/dynamic";
 
 import { useSession, signIn, signOut } from "next-auth/react";
 
+import { HeroBackground } from '@/components/HeroAnimations';
+
 // Optmize the heavy 3D canvas out of the SSR bundle for Vercel deployment
 const Background3D = dynamic(() => import('@/components/Background3D').then(mod => mod.Background3D), { ssr: false });
 
@@ -41,10 +43,7 @@ export default function MarketingPage() {
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 flex flex-col items-center text-center">
-                <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 blur-[120px] rounded-full mix-blend-screen" />
-                    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/20 blur-[120px] rounded-full mix-blend-screen" />
-                </div>
+                <HeroBackground />
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -53,33 +52,41 @@ export default function MarketingPage() {
                     className="relative z-10 max-w-5xl mx-auto"
                 >
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-white/10 text-sm font-medium mb-8">
-                        <Sparkles className="w-4 h-4 text-primary" />
-                        <span className="text-white/80">The Future of Web Storytelling</span>
+                        <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                        <span className="text-white/80 tracking-wide font-medium">ImmersaAI Engine v2.0 Active</span>
                     </div>
 
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 leading-[1.05]">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/40">
+                    <motion.h1
+                        className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 leading-[1.05]"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                    >
+                        <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-white via-white/80 to-white/30 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
                             AI cinematic brand
                         </span>
                         <br />
-                        experience engine.
-                    </h1>
+                        <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-[0_0_40px_rgba(129,140,248,0.3)]">
+                            experience engine.
+                        </span>
+                    </motion.h1>
 
                     <p className="text-xl md:text-2xl text-white/50 mb-12 max-w-3xl mx-auto font-light leading-relaxed">
                         Prompt to an agency-level 3D website in seconds. Built for founders, creators, and brands who refuse to look like everyone else.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
+                    <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 relative z-20">
                         <Link
                             href="/engine"
-                            className="group flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-semibold text-lg hover:scale-105 transition-all duration-300"
+                            className="group flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/90 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all duration-300"
                         >
+                            <Sparkles className="w-4 h-4 text-primary" />
                             Enter the Engine
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </Link>
                         <a
                             href="#showcase"
-                            className="px-8 py-4 rounded-full glass-panel text-white font-medium text-lg hover:bg-white/10 transition-colors duration-300"
+                            className="px-8 py-4 rounded-full glass-panel text-white font-medium text-lg border border-white/10 hover:border-white/30 hover:bg-white/10 transition-colors duration-300"
                         >
                             View Examples
                         </a>
