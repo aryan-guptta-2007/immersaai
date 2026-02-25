@@ -1,7 +1,6 @@
-import { NextResponse } from 'next/server';
-import { orchestrator } from '@/lib/ai/orchestrator';
+export const dynamic = "force-dynamic";
 
-export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server';
 
 // Simple in-memory rate limiter per Vercel instance
 const rateLimitMap = new Map<string, { count: number, resetTime: number }>();
@@ -9,6 +8,10 @@ const LIMIT = 5;
 const WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export async function POST(req: Request) {
+    // 1. DYNAMICALLY IMPORT ORCHESTRATOR at runtime to prevent Next.js from evaluating OpenAI/Prisma at build time
+    const { AIOrchestrator } = await import('@/lib/ai/orchestrator');
+    const orchestrator = new AIOrchestrator('openai');
+
     try {
         // Rate Limiting Logic
         const ip = req.headers.get('x-forwarded-for') || 'unknown';
@@ -40,7 +43,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
         }
 
-        // Call our server-side orchestrator
+        // Call our dynamically loaded server-side orchestrator
         const result = await orchestrator.generateExperience(prompt);
 
         return NextResponse.json(result);
