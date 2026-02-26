@@ -1,9 +1,13 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
-import prisma from "@/lib/db";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(
+    req: Request,
+    context: { params: { id: string } }
+) {
     try {
         const session = await getServerSession(authOptions);
         const adminEmail = process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL;
@@ -12,13 +16,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const paymentId = (await params).id;
+        const paymentId = context.params.id;
         const body = await req.json();
         const { action } = body; // "APPROVE" or "REJECT"
 
         if (!['APPROVE', 'REJECT'].includes(action)) {
             return NextResponse.json({ error: "Invalid action" }, { status: 400 });
         }
+
+        // Import PrismaClient dynamically inside the handler to prevent static analysis DB execution at build time
+        const { PrismaClient } = await import("@prisma/client");
+        const prisma = new PrismaClient();
 
         const payment = await prisma.payment.findUnique({
             where: { id: paymentId }
@@ -33,21 +41,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         }
 
         if (action === 'APPROVE') {
-            // Update payment and upgrade user account in a transaction
             await prisma.$transaction([
                 prisma.payment.update({
                     where: { id: paymentId },
                     data: { status: 'APPROVED' }
                 }),
-                // @ts-ignore: Prisma client caches previous schema, but 'plan' exists in DB
                 prisma.user.update({
                     where: { id: payment.userId! },
-                    data: { plan: 'PRO' } as any // Upgrade to unlocked plan (cast to any to bypass Vercel TS cache)
+                    data: { plan: 'pro' } // Upgraded to 'pro' instead of 'PRO' to prevent enum errors
                 })
             ]);
             return NextResponse.json({ success: true, message: "Payment approved and user upgraded to PRO." });
         } else {
-            // Reject payment
             await prisma.payment.update({
                 where: { id: paymentId },
                 data: { status: 'REJECTED' }
