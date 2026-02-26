@@ -6,7 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(
     req: Request,
-    context: { params: { id: string } }
+    { params }: { params: { id: string } }
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -16,7 +16,7 @@ export async function POST(
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const paymentId = context.params.id;
+        const paymentId = params.id;
         const body = await req.json();
         const { action } = body; // "APPROVE" or "REJECT"
 
