@@ -41,7 +41,7 @@ model Generation {
 model Payment {
   id            String    @id @default(cuid())
   orderId       String    @unique @default(cuid()) // Backward compat for UPI flow + Razorpay webhook
-  upiId         String    @unique // The unique UPI reference number submitted by the user
+  upiId         String?   @unique // The unique UPI reference number submitted by the user
   amount        Int       // Stored in INR
   tier          String    // e.g. "PRO"
   status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
