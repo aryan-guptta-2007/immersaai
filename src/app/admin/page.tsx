@@ -9,7 +9,7 @@ interface Payment {
     id: string;
     upiId: string;
     amount: number;
-    planRequested: string;
+    tier: string;
     status: string;
     createdAt: string;
     user: {
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className="inline-flex items-center px-2 py-1 rounded bg-primary/20 text-primary text-xs font-bold font-sans tracking-wide">
-                                                    {payment.planRequested} (₹{payment.amount})
+                                                    {payment.tier} (₹{payment.amount})
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">

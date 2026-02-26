@@ -47,10 +47,10 @@ export async function POST(req: Request) {
         const payment = await prisma.payment.create({
             data: {
                 upiId: upiTxnId,
-                amount: planRequested === 'PRO' ? 999 : 499, // simplified pricing mock
-                planRequested: 'PRO', // Force PRO for any tier selection in this MVP 
+                amount: 999, // Force 999 INR for this MVP
+                tier: 'PRO', // Force PRO for any tier selection in this MVP
                 status: 'PENDING',
-                userId: user.id
+                userId: (session.user as any).id
             }
         });
 
