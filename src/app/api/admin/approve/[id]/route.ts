@@ -42,7 +42,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
                 // @ts-ignore: Prisma client caches previous schema, but 'plan' exists in DB
                 prisma.user.update({
                     where: { id: payment.userId! },
-                    data: { plan: 'PRO' } // Upgrade to unlocked plan
+                    data: { plan: 'PRO' } as any // Upgrade to unlocked plan (cast to any to bypass Vercel TS cache)
                 })
             ]);
             return NextResponse.json({ success: true, message: "Payment approved and user upgraded to PRO." });
