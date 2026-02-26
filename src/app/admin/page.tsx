@@ -54,21 +54,6 @@ export default function AdminDashboard() {
         }
     };
 
-    const fetchPayments = async () => {
-        setIsLoading(true);
-        try {
-            const res = await fetch("/api/admin/payments");
-            const data = await res.json();
-            if (data.payments) {
-                setPayments(data.payments);
-            }
-        } catch (error) {
-            console.error("Failed to fetch payments", error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const handleAction = async (id: string, action: 'APPROVE' | 'REJECT') => {
         if (!confirm(`Are you sure you want to ${action} this payment?`)) return;
 

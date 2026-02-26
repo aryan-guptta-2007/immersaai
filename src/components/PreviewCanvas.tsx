@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Download, Share2, RefreshCw, Rocket, Sparkles } from "lucide-react";
 import { Background3D } from "./Background3D";
 import { useRef, useState } from "react";
@@ -44,9 +44,12 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
     // Darken background slightly to reveal features
     const featuresBgColor = useTransform(scrollYProgress, [0.1, 0.3], ["rgba(0,0,0,0)", "rgba(0,0,0,1)"]);
 
+    const [showExportSuccess, setShowExportSuccess] = useState(false);
+
     const handleExport = () => {
         if ((session?.user as any)?.plan === "PRO") {
-            alert("Export Initiated. Production bundle is compiling...");
+            setShowExportSuccess(true);
+            setTimeout(() => setShowExportSuccess(false), 5000); // Auto-hide after 5s
             return;
         }
         setPricingAction('export');
@@ -55,7 +58,8 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
 
     const handleDeploy = () => {
         if ((session?.user as any)?.plan === "PRO") {
-            alert("Deploy Initiated. Pushing build to edge worker...");
+            setShowExportSuccess(true);
+            setTimeout(() => setShowExportSuccess(false), 5000);
             return;
         }
         setPricingAction('deploy');
@@ -80,6 +84,44 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                 onClose={() => setShowShare(false)}
                 siteUrl="https://immersa.ai/site/preview-demo"
             />
+
+            {/* Post-Purchase / Pro Action Success Overlay */}
+            <AnimatePresence>
+                {showExportSuccess && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: 50 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: 50 }}
+                        className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[60] glass-panel px-8 py-6 rounded-2xl border border-primary/30 flex items-center justify-center flex-col shadow-[0_20px_60px_rgba(var(--primary-rgb),0.2)] bg-black/90 backdrop-blur-3xl overflow-hidden"
+                    >
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10 opacity-50 pointer-events-none" />
+                        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
+                        <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+                            <Sparkles className="w-6 h-6 text-primary" />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-1">Creator Engine Activated.</h3>
+                        <p className="text-sm font-mono text-white/50 mb-6 uppercase tracking-widest">Welcome to PRO Mode.</p>
+
+                        <div className="flex items-center gap-3 w-full bg-white/5 p-3 rounded-lg border border-white/10">
+                            <div className="w-8 h-8 rounded bg-black/50 flex items-center justify-center border border-white/5">
+                                <Rocket className="w-4 h-4 text-white/70" />
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-xs text-white/40 font-mono tracking-wider mb-1">Compiling React Bundle...</div>
+                                <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                                    <motion.div
+                                        initial={{ width: "0%" }}
+                                        animate={{ width: "100%" }}
+                                        transition={{ duration: 4.5, ease: "linear" }}
+                                        className="h-full bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.8)]"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <motion.header
                 initial={{ y: -50, opacity: 0 }}
