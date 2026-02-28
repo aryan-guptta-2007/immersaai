@@ -23,7 +23,8 @@ export default function MarketingPage() {
     const [prompt, setPrompt] = useState("");
 
     return (
-        <div className="min-h-screen bg-black text-white selection:bg-primary/30 font-light overflow-x-hidden relative bg-noise">
+        <div className="min-h-screen bg-black text-white selection:bg-primary/30 font-light overflow-x-hidden relative">
+            <div className="fixed inset-0 z-50 pointer-events-none bg-noise" />
             <ScrollStoryBackground />
 
             {/* Navigation */}

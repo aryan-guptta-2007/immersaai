@@ -25,7 +25,7 @@ export default function RootLayout({
         className={`${inter.variable} antialiased min-h-screen bg-white text-black`}
         suppressHydrationWarning
       >
-        {/* <CursorPhysics /> */}
+        <CursorPhysics />
         <AuthProvider>
           {children}
         </AuthProvider>
