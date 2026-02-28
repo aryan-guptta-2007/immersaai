@@ -56,18 +56,9 @@ export function CursorPhysics() {
 
     return (
         <>
-            <style dangerouslySetInnerHTML={{
-                __html: `
-        /* Hide default cursor globally */
-        @media (pointer: fine) {
-          body { cursor: none; }
-          a, button, input { cursor: none !important; }
-        }
-      `}} />
-
             {/* Primary Dot - Follows Instantly */}
             <motion.div
-                className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[100] mix-blend-difference hidden md:block"
+                className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none -z-10 hidden md:block"
                 style={{
                     x: useSpring(cursorX, { damping: 40, stiffness: 400 }),
                     y: useSpring(cursorY, { damping: 40, stiffness: 400 }),
@@ -77,7 +68,7 @@ export function CursorPhysics() {
 
             {/* Trailing Aura/Glow - Magnetic expansion */}
             <motion.div
-                className="fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none z-[99] hidden md:flex items-center justify-center border border-white/30 backdrop-blur-[2px]"
+                className="fixed top-0 left-0 w-8 h-8 rounded-full pointer-events-none -z-10 hidden md:flex items-center justify-center border border-white/30 backdrop-blur-[2px]"
                 style={{
                     x: trailX,
                     y: trailY,
