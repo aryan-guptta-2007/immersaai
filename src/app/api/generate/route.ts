@@ -2,15 +2,15 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: Request) {
     try {
         // Runtime imports
         const { PrismaClient } = await import("@prisma/client");
         const prisma = new PrismaClient();
-
-        const { GoogleGenerativeAI } = await import("@google/generative-ai");
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
         // Auth Check
         const { getServerSession } = await import("next-auth");
@@ -57,26 +57,32 @@ export async function POST(req: Request) {
         }
 
         const model = genAI.getGenerativeModel({
-            model: "gemini-2.5-flash",
-            generationConfig: { responseMimeType: "application/json" }
+            model: "gemini-1.5-flash"
         });
 
-        const result = await model.generateContent(`System: Return JSON only.\n\nUser: ${prompt}`);
-
-        const parsed = JSON.parse(
-            result.response.text() || "{}"
+        const result = await model.generateContent(
+            `Design a cinematic website for: ${prompt}`
         );
+
+        const text = result.response.text();
+
+        const responseData = {
+            theme: "default",
+            headline: "AI Generated Website",
+            subheadline: text,
+            features: []
+        };
 
         await prisma.generation.create({
             data: {
                 prompt,
-                theme: parsed.theme || "default",
-                content: JSON.stringify(parsed),
+                theme: responseData.theme,
+                content: JSON.stringify(responseData),
                 userId: (session?.user as any)?.id || null,
             },
         });
 
-        return NextResponse.json(parsed);
+        return NextResponse.json(responseData);
 
     } catch (err) {
         console.error(err);
