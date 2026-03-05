@@ -9,10 +9,8 @@ export async function POST(req: Request) {
         const { PrismaClient } = await import("@prisma/client");
         const prisma = new PrismaClient();
 
-        const OpenAI = (await import("openai")).default;
-        const openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY!,
-        });
+        const { GoogleGenerativeAI } = await import("@google/generative-ai");
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
         // Auth Check
         const { getServerSession } = await import("next-auth");
@@ -58,17 +56,15 @@ export async function POST(req: Request) {
             );
         }
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [
-                { role: "system", content: "Return JSON only." },
-                { role: "user", content: prompt }
-            ],
-            response_format: { type: "json_object" },
+        const model = genAI.getGenerativeModel({
+            model: "gemini-2.5-flash",
+            generationConfig: { responseMimeType: "application/json" }
         });
 
+        const result = await model.generateContent(`System: Return JSON only.\n\nUser: ${prompt}`);
+
         const parsed = JSON.parse(
-            response.choices[0].message.content || "{}"
+            result.response.text() || "{}"
         );
 
         await prisma.generation.create({
