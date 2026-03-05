@@ -19,8 +19,14 @@ export async function POST(req: Request) {
         const text = result.response.text();
 
         return Response.json({
-            success: true,
-            content: text,
+            theme: "cyber",
+            headline: text,
+            subheadline: text,
+            features: [
+                "AI Generated Design",
+                "Modern UI",
+                "Interactive Animations"
+            ]
         });
     } catch (error) {
         console.error(error);
