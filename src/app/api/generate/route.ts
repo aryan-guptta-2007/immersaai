@@ -15,18 +15,39 @@ export async function POST(req: Request) {
         });
 
         const promptText = `
-Generate a structured JSON website layout.
+Generate a website layout in JSON format.
 
-User request: ${prompt}
+User prompt: ${prompt}
 
-Return JSON in this format ONLY:
+Return JSON ONLY in this exact structure:
 
 {
  "theme": "cyber",
- "headline": "string",
- "subheadline": "string",
- "features": [
-   { "title": "string", "description": "string" }
+ "pages": [
+   {
+     "name": "landing",
+     "sections": [
+       {
+         "type": "hero",
+         "headline": "string",
+         "subheadline": "string",
+         "cta": "string"
+       },
+       {
+         "type": "features",
+         "items": ["string"]
+       },
+       {
+         "type": "pricing"
+       },
+       {
+         "type": "testimonials"
+       },
+       {
+         "type": "contact"
+       }
+     ]
+   }
  ]
 }
 `;

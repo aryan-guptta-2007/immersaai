@@ -7,12 +7,19 @@ import { useRef, useState } from "react";
 import { PricingModal } from "./PricingModal";
 import { ShareModal } from "./ShareModal";
 import { useSession } from "next-auth/react";
+import { Hero } from "./sections/Hero";
+import { Features } from "./sections/Features";
+import { Pricing } from "./sections/Pricing";
+import { Testimonials } from "./sections/Testimonials";
+import { Contact } from "./sections/Contact";
+import { Footer } from "./sections/Footer";
 
 export interface BrandContext {
     theme: 'cyber' | 'neural' | 'luxury' | 'default';
-    headline: string;
-    subheadline: string;
-    features: { title: string; description: string }[];
+    pages?: { name: string; sections: any[] }[];
+    headline?: string;
+    subheadline?: string;
+    features?: { title: string; description: string }[] | string[];
 }
 
 interface PreviewCanvasProps {
@@ -36,13 +43,22 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
         container: containerRef,
     });
 
-    // Fade out hero text quickly when scrolling
-    const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-    // Slight zoom out of hero text
-    const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.9]);
-
-    // Darken background slightly to reveal features
-    const featuresBgColor = useTransform(scrollYProgress, [0.1, 0.3], ["rgba(0,0,0,0)", "rgba(0,0,0,1)"]);
+    const renderSection = (section: any, index: number) => {
+        switch (section.type) {
+            case "hero":
+                return <Hero key={index} {...section} />;
+            case "features":
+                return <Features key={index} {...section} />;
+            case "pricing":
+                return <Pricing key={index} {...section} />;
+            case "testimonials":
+                return <Testimonials key={index} {...section} />;
+            case "contact":
+                return <Contact key={index} {...section} />;
+            default:
+                return null;
+        }
+    };
 
     const [showExportSuccess, setShowExportSuccess] = useState(false);
 
@@ -197,79 +213,36 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
             </motion.header>
 
             <div ref={containerRef} className="flex-1 overflow-y-auto relative no-scrollbar perspective-1000">
-                <section className="relative min-h-[100vh] flex flex-col items-center justify-center text-center px-4">
-                    <div className="fixed inset-0 z-0 pointer-events-none">
-                        <Background3D theme={brandContext.theme} />
+                <div className="fixed inset-0 z-0 pointer-events-none">
+                    <Background3D theme={brandContext.theme} />
+                </div>
+
+                {/* Dynamically Render Sections from Gemini JSON */}
+                {brandContext.pages && brandContext.pages.length > 0 ? (
+                    <div className="relative z-10 w-full">
+                        {brandContext.pages[0].sections.map(renderSection)}
                     </div>
-
-                    <motion.div
-                        style={{ opacity: heroOpacity, scale: heroScale }}
-                        className="relative z-10 max-w-5xl mx-auto pt-20"
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.8, duration: 0.8 }}
-                        >
-                            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-tight">
-                                {brandContext.headline}
-                            </h1>
-
-                            <p className="text-xl md:text-2xl text-white/60 font-light mb-12 max-w-3xl mx-auto">
-                                {brandContext.subheadline}
-                            </p>
-
-                            <div className="flex items-center justify-center gap-4">
-                                <button className="px-8 py-4 rounded-full bg-white text-black font-semibold text-lg hover:scale-105 transition-transform duration-300">
-                                    Get Started
-                                </button>
-                                <button className="px-8 py-4 rounded-full glass-panel text-white font-semibold text-lg hover:bg-white/10 transition-colors duration-300">
-                                    Learn More
-                                </button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                </section>
-
-                <motion.section
-                    className="relative min-h-screen py-32 px-4 z-20"
-                    style={{ backgroundColor: featuresBgColor }}
-                >
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-transparent pointer-events-none" />
-                    <div className="relative max-w-7xl mx-auto z-10">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {(brandContext?.features || []).map((feature, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, y: 40 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.7, delay: i * 0.15, ease: "easeOut" }}
-                                    viewport={{ once: true, margin: "-100px" }}
-                                    className="glass-panel p-8 rounded-3xl hover:bg-white/[0.05] transition-colors duration-500 group"
-                                >
-                                    <div className="w-12 h-12 rounded-2xl bg-white/5 mb-6 flex items-center justify-center border border-white/10 group-hover:border-primary/50 transition-colors">
-                                        <div className="w-6 h-6 rounded-lg bg-primary/80 group-hover:bg-primary transition-colors" />
-                                    </div>
-                                    <h3 className="text-xl font-semibold text-white mb-4">{feature.title}</h3>
-                                    <p className="text-white/60 font-light leading-relaxed">
-                                        {feature.description}
-                                    </p>
-                                </motion.div>
-                            ))}
-                        </div>
+                ) : (
+                    /* Fallback for old generations */
+                    <div className="relative z-10 w-full">
+                        <Hero
+                            headline={brandContext.headline}
+                            subheadline={brandContext.subheadline}
+                            cta="Get Started"
+                        />
+                        <Features items={brandContext.features} />
                     </div>
-                </motion.section>
+                )}
 
-                {/* Footer / Watermark */}
-                <section className="relative py-8 z-20 bg-black flex justify-center">
-                    {/* Watermark for free tiers */}
-                    {(!session?.user || (session.user as any)?.plan !== "PRO") && (
-                        <div className="fixed bottom-6 right-6 z-50 glass-panel px-4 py-2 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl pointer-events-none select-none">
-                            <Sparkles className="w-3 h-3 text-primary" />
-                            <span className="font-mono text-[10px] text-white/80 uppercase tracking-widest">Built with ImmersaAI Engine</span>
-                        </div>
-                    )}
-                </section>
+                <Footer />
+
+                {/* Watermark for free tiers */}
+                {(!session?.user || (session.user as any)?.plan !== "PRO") && (
+                    <div className="fixed bottom-6 right-6 z-50 glass-panel px-4 py-2 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl pointer-events-none select-none">
+                        <Sparkles className="w-3 h-3 text-primary" />
+                        <span className="font-mono text-[10px] text-white/80 uppercase tracking-widest">Built with ImmersaAI Engine</span>
+                    </div>
+                )}
             </div>
         </motion.div>
     );
