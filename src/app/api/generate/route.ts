@@ -20,12 +20,12 @@ export async function POST(req: Request) {
 
         return Response.json({
             theme: "cyber",
-            headline: text,
-            subheadline: text,
+            headline: "AI Generated Website",
+            subheadline: "Built with Gemini AI",
             features: [
-                "AI Generated Design",
-                "Interactive Animations",
-                "Modern UI"
+                "3D Animations",
+                "Interactive UI",
+                "AI Generated Layout"
             ]
         });
     } catch (error) {
