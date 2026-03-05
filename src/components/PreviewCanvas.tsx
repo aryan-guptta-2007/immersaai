@@ -238,7 +238,7 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/90 to-transparent pointer-events-none" />
                     <div className="relative max-w-7xl mx-auto z-10">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {brandContext.features.map((feature, i) => (
+                            {(brandContext?.features || []).map((feature, i) => (
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, y: 40 }}
