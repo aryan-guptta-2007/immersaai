@@ -14,20 +14,31 @@ export async function POST(req: Request) {
             model: "gemini-1.5-flash",
         });
 
-        const result = await model.generateContent(prompt);
+        const promptText = `
+Generate a structured JSON website layout.
 
+User request: ${prompt}
+
+Return JSON in this format ONLY:
+
+{
+ "theme": "cyber",
+ "headline": "string",
+ "subheadline": "string",
+ "features": [
+   { "title": "string", "description": "string" }
+ ]
+}
+`;
+
+        const result = await model.generateContent(promptText);
         const text = result.response.text();
 
-        return Response.json({
-            theme: "cyber",
-            headline: "AI Generated Website",
-            subheadline: "Built with Gemini AI",
-            features: [
-                "3D Animations",
-                "Interactive UI",
-                "AI Generated Layout"
-            ]
-        });
+        // Clean markdown backticks if present before parsing
+        const cleanedText = text.replace(/^```json\n|\n```$/g, '').trim();
+        const data = JSON.parse(cleanedText);
+
+        return Response.json(data);
     } catch (error) {
         console.error(error);
 
