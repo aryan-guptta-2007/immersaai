@@ -24,8 +24,8 @@ export async function POST(req: Request) {
             subheadline: text,
             features: [
                 "AI Generated Design",
-                "Modern UI",
-                "Interactive Animations"
+                "Interactive Animations",
+                "Modern UI"
             ]
         });
     } catch (error) {
