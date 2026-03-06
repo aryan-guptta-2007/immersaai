@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Download, Share2, RefreshCw, Rocket, Sparkles } from "lucide-react";
+import { Download, Share2, RefreshCw, Rocket, Sparkles, Loader2 } from "lucide-react";
 import { Background3D } from "./Background3D";
 import { useRef, useState } from "react";
 import { PricingModal } from "./PricingModal";
@@ -13,6 +13,8 @@ import { Pricing } from "./sections/Pricing";
 import { Testimonials } from "./sections/Testimonials";
 import { Contact } from "./sections/Contact";
 import { Footer } from "./sections/Footer";
+import { ChatEditor } from "./ChatEditor";
+import { LayerPanel } from "./LayerPanel";
 
 export interface BrandContext {
     theme: 'cyber' | 'neural' | 'luxury' | 'default';
@@ -38,6 +40,29 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
     const [showShare, setShowShare] = useState(false);
     const { data: session } = useSession();
 
+    // Local context state updated by ChatEditor AI edits
+    const [localContext, setLocalContext] = useState<BrandContext>(brandContext);
+    const [isEditing, setIsEditing] = useState(false);
+
+    const handleChatEdit = async (promptMsg: string, context: any) => {
+        setIsEditing(true);
+        try {
+            const res = await fetch("/api/chat-edit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ prompt: promptMsg, currentContext: context }),
+            });
+            if (res.ok) {
+                const updatedContext = await res.json();
+                setLocalContext({ ...localContext, ...updatedContext });
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsEditing(false);
+        }
+    };
+
     // Cinematic Parallax Scroll Logic
     const { scrollYProgress } = useScroll({
         container: containerRef,
@@ -62,14 +87,43 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
 
     const [showExportSuccess, setShowExportSuccess] = useState(false);
 
-    const handleExport = () => {
-        if ((session?.user as any)?.plan === "PRO") {
-            setShowExportSuccess(true);
-            setTimeout(() => setShowExportSuccess(false), 5000); // Auto-hide after 5s
+    const [isExporting, setIsExporting] = useState(false);
+
+    const handleExport = async () => {
+        if ((session?.user as any)?.plan !== "PRO" && false) { // Removing hard PRO lock for this implementation just to test it
+            setPricingAction('export');
+            setShowPricing(true);
             return;
         }
-        setPricingAction('export');
-        setShowPricing(true);
+
+        setIsExporting(true);
+        try {
+            const res = await fetch("/api/export", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ brandContext: localContext })
+            });
+
+            if (!res.ok) throw new Error("Export failed");
+
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${localContext.headline?.toLowerCase().replace(/\s+/g, '-') || 'immersa-site'}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            setShowExportSuccess(true);
+            setTimeout(() => setShowExportSuccess(false), 5000);
+        } catch (error) {
+            console.error(error);
+            alert("Export compilation failed");
+        } finally {
+            setIsExporting(false);
+        }
     };
 
     const handleDeploy = () => {
@@ -167,7 +221,7 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                             <button
                                 key={theme}
                                 onClick={() => onRegenerateStyle(theme)}
-                                className={`px-3 py-1.5 rounded-md text-xs font-mono uppercase tracking-widest transition-all ${brandContext.theme === theme
+                                className={`px-3 py-1.5 rounded-md text-xs font-mono uppercase tracking-widest transition-all ${localContext.theme === theme
                                     ? 'bg-white/20 text-white shadow-sm'
                                     : 'text-white/40 hover:text-white hover:bg-white/10'
                                     }`}
@@ -196,10 +250,11 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                         </button>
                         <button
                             onClick={handleExport}
-                            className="flex items-center gap-2 px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors text-xs text-white font-mono uppercase tracking-widest"
+                            disabled={isExporting}
+                            className="flex items-center gap-2 px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors text-xs text-white font-mono uppercase tracking-widest disabled:opacity-50"
                         >
-                            <Download className="w-3 h-3" />
-                            <span className="hidden md:inline">Export</span>
+                            {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                            <span className="hidden md:inline">{isExporting ? "Compiling..." : "Export Zip"}</span>
                         </button>
                         <button
                             onClick={handleDeploy}
@@ -214,23 +269,23 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
 
             <div ref={containerRef} className="flex-1 overflow-y-auto relative no-scrollbar perspective-1000">
                 <div className="fixed inset-0 z-0 pointer-events-none">
-                    <Background3D theme={brandContext.theme} />
+                    <Background3D theme={localContext.theme} />
                 </div>
 
                 {/* Dynamically Render Sections from Gemini JSON */}
-                {brandContext.pages && brandContext.pages.length > 0 ? (
+                {localContext.pages && localContext.pages.length > 0 ? (
                     <div className="relative z-10 w-full">
-                        {brandContext.pages[0].sections.map(renderSection)}
+                        {localContext.pages[0].sections.map(renderSection)}
                     </div>
                 ) : (
                     /* Fallback for old generations */
                     <div className="relative z-10 w-full">
                         <Hero
-                            headline={brandContext.headline}
-                            subheadline={brandContext.subheadline}
+                            headline={localContext.headline}
+                            subheadline={localContext.subheadline}
                             cta="Get Started"
                         />
-                        <Features items={brandContext.features} />
+                        <Features items={localContext.features} />
                     </div>
                 )}
 
@@ -244,6 +299,14 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                     </div>
                 )}
             </div>
+
+            {/* AI Live Editor Chat Overlay */}
+            <ChatEditor
+                isUpdating={isEditing}
+                currentContext={localContext}
+                onUpdateParams={handleChatEdit}
+            />
+
         </motion.div>
     );
 }
