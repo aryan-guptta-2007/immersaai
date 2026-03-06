@@ -24,22 +24,32 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        if (response.status === 403) {
+        let errorMessage = "Generation failed";
+        try {
           const errorData = await response.json();
-          alert(errorData.error || "Free limit reached. Upgrade to Pro.");
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = await response.text();
+        }
+
+        if (response.status === 403) {
+          alert(errorMessage || "Free limit reached. Upgrade to Pro.");
           setIsGenerating(false);
           return;
+        } else if (response.status === 504) {
+          throw new Error("Vercel Timeout (504). The AI took too long to generate code. (maxDuration=60 was just added, please redeploy!)");
         }
-        throw new Error('Generation failed');
+
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
       setGeneratedCode(data.code);
       setGenerationId(data.id || "gen-" + Date.now());
       setGeneratedPrompt(prompt);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Uh oh! Generation engine failed to hook up.");
+      alert(`Uh oh! Generation engine failed to hook up.\n\nDetails: ${error.message || error}`);
     } finally {
       setIsGenerating(false);
     }

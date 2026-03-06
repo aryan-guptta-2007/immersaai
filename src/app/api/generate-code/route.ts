@@ -1,19 +1,19 @@
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
-
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: Request) {
-    try {
-        const { prompt } = await req.json();
+  try {
+    const { prompt } = await req.json();
 
-        const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
-        });
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+    });
 
-        const promptText = `
+    const promptText = `
 You are an elite, senior React and WebGL developer.
 Generate a complete, production-ready, highly-animated, dynamic Next.js landing page based on the following request:
 
@@ -43,19 +43,19 @@ export default function GeneratedSite() {
 }
 `;
 
-        const result = await model.generateContent(promptText);
-        let text = result.response.text();
+    const result = await model.generateContent(promptText);
+    let text = result.response.text();
 
-        // Extra cleanup just in case Gemini disobeys the instruction and wraps in markdown
-        text = text.replace(/^```(typescript|tsx|jsx|js|ts)?\n/, '');
-        text = text.replace(/```$/g, '');
+    // Extra cleanup just in case Gemini disobeys the instruction and wraps in markdown
+    text = text.replace(/^```(typescript|tsx|jsx|js|ts)?\n/, '');
+    text = text.replace(/```$/g, '');
 
-        return Response.json({ code: text });
-    } catch (error) {
-        console.error(error);
-        return Response.json({
-            success: false,
-            error: "Code generation compilation failed",
-        }, { status: 500 });
-    }
+    return Response.json({ code: text });
+  } catch (error) {
+    console.error(error);
+    return Response.json({
+      success: false,
+      error: "Code generation compilation failed",
+    }, { status: 500 });
+  }
 }
