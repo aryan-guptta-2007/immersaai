@@ -47,15 +47,16 @@ export default function GeneratedSite() {
     let text = result.response.text();
 
     // Extra cleanup just in case Gemini disobeys the instruction and wraps in markdown
-    text = text.replace(/^```(typescript|tsx|jsx|js|ts)?\n/, '');
-    text = text.replace(/```$/g, '');
+    text = text.replace(/^```(tsx|jsx|js|ts|typescript|react)?\s*/i, "");
+    text = text.replace(/```\s*$/g, "");
+    text = text.trim();
 
     return Response.json({ code: text });
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    console.error("Gemini Generation Error:", error);
     return Response.json({
       success: false,
-      error: "Code generation compilation failed",
+      error: error.message || "Code generation compilation failed",
     }, { status: 500 });
   }
 }
