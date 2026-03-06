@@ -4,20 +4,20 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Background3D } from "@/components/Background3D";
 import { PromptInput } from "@/components/PromptInput";
-import { PreviewCanvas, BrandContext } from "@/components/PreviewCanvas";
+import { PreviewCanvas } from "@/components/PreviewCanvas";
 import { GenerationLoader } from "@/components/GenerationLoader";
 
 export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
-  const [brandContext, setBrandContext] = useState<BrandContext | null>(null);
+  const [generatedCode, setGeneratedCode] = useState<string | null>(null);
   const [generationId, setGenerationId] = useState<string | null>(null);
 
   const handleGenerate = async (prompt: string) => {
     setIsGenerating(true);
 
     try {
-      const response = await fetch('/api/generate', {
+      const response = await fetch('/api/generate-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
@@ -34,8 +34,8 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setBrandContext(data);
-      setGenerationId(data.id); // Assuming the API returns the DB ID
+      setGeneratedCode(data.code);
+      setGenerationId(data.id || "gen-" + Date.now());
       setGeneratedPrompt(prompt);
     } catch (error) {
       console.error(error);
@@ -47,20 +47,17 @@ export default function Home() {
 
   const handleRegenerate = () => {
     setGeneratedPrompt(null);
-    setBrandContext(null);
+    setGeneratedCode(null);
     setGenerationId(null);
   };
 
-  const handleRegenerateStyle = (theme: BrandContext['theme']) => {
-    if (brandContext) {
-      setBrandContext({ ...brandContext, theme });
-    }
+  const handleRegenerateStyle = (theme: string) => {
+    // Left empty for backwards compatibility for now since Sandpack runs internally
   };
-
   return (
     <main className="relative min-h-screen bg-black text-white flex flex-col items-center justify-center overflow-hidden">
       <AnimatePresence mode="wait">
-        {!generatedPrompt || !brandContext ? (
+        {!generatedPrompt || !generatedCode ? (
           <motion.div
             key="editor"
             initial={{ opacity: 0 }}
@@ -132,10 +129,10 @@ export default function Home() {
           <PreviewCanvas
             key="preview"
             prompt={generatedPrompt}
-            brandContext={brandContext}
+            generatedCode={generatedCode}
             generationId={generationId || undefined}
             onRegenerate={handleRegenerate}
-            onRegenerateStyle={handleRegenerateStyle}
+            onRegenerateStyle={handleRegenerateStyle as any}
           />
         )}
       </AnimatePresence>

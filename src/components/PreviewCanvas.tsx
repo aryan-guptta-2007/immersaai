@@ -7,32 +7,18 @@ import { useRef, useState } from "react";
 import { PricingModal } from "./PricingModal";
 import { ShareModal } from "./ShareModal";
 import { useSession } from "next-auth/react";
-import { Hero } from "./sections/Hero";
-import { Features } from "./sections/Features";
-import { Pricing } from "./sections/Pricing";
-import { Testimonials } from "./sections/Testimonials";
-import { Contact } from "./sections/Contact";
-import { Footer } from "./sections/Footer";
+import { Sandpack } from "@codesandbox/sandpack-react";
 import { ChatEditor } from "./ChatEditor";
-import { LayerPanel } from "./LayerPanel";
-
-export interface BrandContext {
-    theme: 'cyber' | 'neural' | 'luxury' | 'default';
-    pages?: { name: string; sections: any[] }[];
-    headline?: string;
-    subheadline?: string;
-    features?: { title: string; description: string }[] | string[];
-}
 
 interface PreviewCanvasProps {
     prompt: string;
-    brandContext: BrandContext;
+    generatedCode: string;
     generationId?: string;
     onRegenerate: () => void;
-    onRegenerateStyle: (theme: BrandContext['theme']) => void;
+    onRegenerateStyle: (theme: string) => void;
 }
 
-export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate, onRegenerateStyle }: PreviewCanvasProps) {
+export function PreviewCanvas({ prompt, generatedCode, generationId, onRegenerate, onRegenerateStyle }: PreviewCanvasProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [showPricing, setShowPricing] = useState(false);
@@ -40,21 +26,23 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
     const [showShare, setShowShare] = useState(false);
     const { data: session } = useSession();
 
-    // Local context state updated by ChatEditor AI edits
-    const [localContext, setLocalContext] = useState<BrandContext>(brandContext);
+    // Local code state updated by ChatEditor AI edits
+    const [localCode, setLocalCode] = useState<string>(generatedCode);
     const [isEditing, setIsEditing] = useState(false);
 
-    const handleChatEdit = async (promptMsg: string, context: any) => {
+    const handleChatEdit = async (promptMsg: string, currentCode: string) => {
         setIsEditing(true);
+        // We will build a specific chat-edit endpoint for code strings shortly.
+        // For now, re-trigger full generation with combined prompt contexts.
         try {
-            const res = await fetch("/api/chat-edit", {
+            const res = await fetch("/api/generate-code", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt: promptMsg, currentContext: context }),
+                body: JSON.stringify({ prompt: `Modify this code: ${currentCode}\n\nModification Request: ${promptMsg}` }),
             });
             if (res.ok) {
-                const updatedContext = await res.json();
-                setLocalContext({ ...localContext, ...updatedContext });
+                const updatedCode = await res.json();
+                setLocalCode(updatedCode.code);
             }
         } catch (error) {
             console.error(error);
@@ -63,25 +51,10 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
         }
     };
 
-    // Cinematic Parallax Scroll Logic
-    const { scrollYProgress } = useScroll({
-        container: containerRef,
-    });
-
-    const renderSection = (section: any, index: number) => {
-        switch (section.type) {
-            case "hero":
-                return <Hero key={index} {...section} />;
-            case "features":
-                return <Features key={index} {...section} />;
-            case "pricing":
-                return <Pricing key={index} {...section} />;
-            case "testimonials":
-                return <Testimonials key={index} {...section} />;
-            case "contact":
-                return <Contact key={index} {...section} />;
-            default:
-                return null;
+    const sandpackFiles = {
+        "/App.tsx": {
+            code: localCode,
+            active: true
         }
     };
 
@@ -98,10 +71,12 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
 
         setIsExporting(true);
         try {
+            // Export functionality will be rebuilt to pipe raw Sandpack files.
+            // Leaving shell logic here but removing `localContext` reference for now.
             const res = await fetch("/api/export", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ brandContext: localContext })
+                body: JSON.stringify({ brandContext: {} })
             });
 
             if (!res.ok) throw new Error("Export failed");
@@ -110,7 +85,7 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `${localContext.headline?.toLowerCase().replace(/\s+/g, '-') || 'immersa-site'}.zip`;
+            a.download = `immersa-ai-export.zip`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -221,7 +196,7 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                             <button
                                 key={theme}
                                 onClick={() => onRegenerateStyle(theme)}
-                                className={`px-3 py-1.5 rounded-md text-xs font-mono uppercase tracking-widest transition-all ${localContext.theme === theme
+                                className={`px-3 py-1.5 rounded-md text-xs font-mono uppercase tracking-widest transition-all ${theme === 'default'
                                     ? 'bg-white/20 text-white shadow-sm'
                                     : 'text-white/40 hover:text-white hover:bg-white/10'
                                     }`}
@@ -267,35 +242,42 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
                 </div>
             </motion.header>
 
-            <div ref={containerRef} className="flex-1 overflow-y-auto relative no-scrollbar perspective-1000">
-                <div className="fixed inset-0 z-0 pointer-events-none">
-                    <Background3D theme={localContext.theme} />
-                </div>
-
-                {/* Dynamically Render Sections from Gemini JSON */}
-                {localContext.pages && localContext.pages.length > 0 ? (
-                    <div className="relative z-10 w-full">
-                        {localContext.pages[0].sections.map(renderSection)}
-                    </div>
-                ) : (
-                    /* Fallback for old generations */
-                    <div className="relative z-10 w-full">
-                        <Hero
-                            headline={localContext.headline}
-                            subheadline={localContext.subheadline}
-                            cta="Get Started"
-                        />
-                        <Features items={localContext.features} />
-                    </div>
-                )}
-
-                <Footer />
+            <div className="flex-1 w-full relative overflow-hidden bg-[#151515]">
+                {/* Dynamically Render Virtual DOM Output generated by AI via Sandpack */}
+                <Sandpack
+                    template="react-ts"
+                    theme="dark"
+                    files={sandpackFiles}
+                    customSetup={{
+                        dependencies: {
+                            "framer-motion": "latest",
+                            "lucide-react": "latest",
+                            "tailwindcss": "latest",
+                            "postcss": "latest",
+                            "autoprefixer": "latest",
+                            "@react-three/fiber": "latest",
+                            "@react-three/drei": "latest",
+                            "three": "latest"
+                        }
+                    }}
+                    options={{
+                        showNavigator: false,
+                        showTabs: false,
+                        showLineNumbers: false,
+                        editorHeight: "100vh",
+                        classes: {
+                            "sp-layout": "!h-[calc(100vh-64px)] !rounded-none !border-none",
+                            "sp-preview-container": "!h-[calc(100vh-64px)] !bg-transparent",
+                            "sp-preview-iframe": "!h-[calc(100vh-64px)] !min-h-[calc(100vh-64px)]"
+                        }
+                    }}
+                />
 
                 {/* Watermark for free tiers */}
                 {(!session?.user || (session.user as any)?.plan !== "PRO") && (
-                    <div className="fixed bottom-6 right-6 z-50 glass-panel px-4 py-2 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl pointer-events-none select-none">
+                    <div className="absolute bottom-6 right-6 z-50 glass-panel px-4 py-2 flex items-center gap-2 rounded-full border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl pointer-events-none select-none">
                         <Sparkles className="w-3 h-3 text-primary" />
-                        <span className="font-mono text-[10px] text-white/80 uppercase tracking-widest">Built with ImmersaAI Engine</span>
+                        <span className="font-mono text-[10px] text-white/80 uppercase tracking-widest">Built with ImmersaAI Editor</span>
                     </div>
                 )}
             </div>
@@ -303,7 +285,7 @@ export function PreviewCanvas({ prompt, brandContext, generationId, onRegenerate
             {/* AI Live Editor Chat Overlay */}
             <ChatEditor
                 isUpdating={isEditing}
-                currentContext={localContext}
+                currentContext={localCode as any}
                 onUpdateParams={handleChatEdit}
             />
 
