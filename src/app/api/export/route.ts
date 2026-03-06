@@ -4,41 +4,41 @@ import JSZip from "jszip";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-    try {
-        const { brandContext } = await req.json();
+  try {
+    const { brandContext } = await req.json();
 
-        const zip = new JSZip();
+    const zip = new JSZip();
 
-        // 1. package.json
-        zip.file("package.json", JSON.stringify({
-            name: "immersa-ai-export",
-            version: "0.1.0",
-            private: true,
-            scripts: {
-                dev: "next dev",
-                build: "next build",
-                start: "next start",
-                lint: "next lint"
-            },
-            dependencies: {
-                "react": "^18",
-                "react-dom": "^18",
-                "next": "14.2.5",
-                "framer-motion": "^11.0.0",
-                "lucide-react": "^0.300.0"
-            },
-            devDependencies: {
-                "typescript": "^5",
-                "@types/node": "^20",
-                "@types/react": "^18",
-                "@types/react-dom": "^18",
-                "postcss": "^8",
-                "tailwindcss": "^3.4.1"
-            }
-        }, null, 2));
+    // 1. package.json
+    zip.file("package.json", JSON.stringify({
+      name: "immersa-ai-export",
+      version: "0.1.0",
+      private: true,
+      scripts: {
+        dev: "next dev",
+        build: "next build",
+        start: "next start",
+        lint: "next lint"
+      },
+      dependencies: {
+        "react": "^18",
+        "react-dom": "^18",
+        "next": "14.2.5",
+        "framer-motion": "^11.0.0",
+        "lucide-react": "^0.300.0"
+      },
+      devDependencies: {
+        "typescript": "^5",
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "postcss": "^8",
+        "tailwindcss": "^3.4.1"
+      }
+    }, null, 2));
 
-        // 2. tailwind.config.ts
-        zip.file("tailwind.config.ts", `
+    // 2. tailwind.config.ts
+    zip.file("tailwind.config.ts", `
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -59,8 +59,8 @@ const config: Config = {
 export default config
     `.trim());
 
-        // 3. globals.css
-        zip.file("app/globals.css", `
+    // 3. globals.css
+    zip.file("app/globals.css", `
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -76,8 +76,8 @@ body {
 }
     `.trim());
 
-        // 4. layout.tsx
-        zip.file("app/layout.tsx", `
+    // 4. layout.tsx
+    zip.file("app/layout.tsx", `
 import type { Metadata } from 'next'
 import './globals.css'
 
@@ -99,17 +99,17 @@ export default function RootLayout({
 }
     `.trim());
 
-        // 5. Build dynamic page.tsx with generated sections mapping
-        const sections = brandContext?.pages?.[0]?.sections || [];
-        let imports = [];
-        const uniqueTypes = new Set(sections.map((s: any) => s.type));
+    // 5. Build dynamic page.tsx with generated sections mapping
+    const sections = brandContext?.pages?.[0]?.sections || [];
+    let imports: string[] = [];
+    const uniqueTypes = new Set<string>(sections.map((s: any) => s.type));
 
-        uniqueTypes.forEach((type: any) => {
-            const Capitalized = type.charAt(0).toUpperCase() + type.slice(1);
-            imports.push(`import { ${Capitalized} } from '@/components/sections/${Capitalized}';`);
-        });
+    uniqueTypes.forEach((type: any) => {
+      const Capitalized = type.charAt(0).toUpperCase() + type.slice(1);
+      imports.push(`import { ${Capitalized} } from '@/components/sections/${Capitalized}';`);
+    });
 
-        zip.file("app/page.tsx", `
+    zip.file("app/page.tsx", `
 import React from 'react';
 ${imports.join('\n')}
 
@@ -136,10 +136,10 @@ ${Array.from(uniqueTypes).map((type: any) => `
 }
     `.trim());
 
-        // 6. Generate mock scaffolding for the individual section components
-        uniqueTypes.forEach((type: any) => {
-            const Capitalized = type.charAt(0).toUpperCase() + type.slice(1);
-            zip.file(`components/sections/${Capitalized}.tsx`, `
+    // 6. Generate mock scaffolding for the individual section components
+    uniqueTypes.forEach((type: any) => {
+      const Capitalized = type.charAt(0).toUpperCase() + type.slice(1);
+      zip.file(`components/sections/${Capitalized}.tsx`, `
 import React from 'react';
 
 export function ${Capitalized}(props: any) {
@@ -153,20 +153,20 @@ export function ${Capitalized}(props: any) {
   )
 }
       `.trim());
-        });
+    });
 
-        const buffer = await zip.generateAsync({ type: "nodebuffer" });
+    const buffer = await zip.generateAsync({ type: "nodebuffer" });
 
-        return new NextResponse(buffer, {
-            status: 200,
-            headers: {
-                "Content-Type": "application/zip",
-                "Content-Disposition": 'attachment; filename="immersa-ai-export.zip"',
-            },
-        });
+    return new NextResponse(buffer as any, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/zip",
+        "Content-Disposition": 'attachment; filename="immersa-ai-export.zip"',
+      },
+    });
 
-    } catch (err) {
-        console.error(err);
-        return NextResponse.json({ error: "Export failed" }, { status: 500 });
-    }
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Export failed" }, { status: 500 });
+  }
 }
