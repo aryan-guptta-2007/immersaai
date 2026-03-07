@@ -51,7 +51,18 @@ export default function Home() {
         return;
       }
 
-      setGeneratedCode(data.code);
+      function cleanCodeLocal(codeText: string) {
+        if (!codeText) return "";
+        return codeText
+          .replace(/```tsx/g, "")
+          .replace(/```jsx/g, "")
+          .replace(/```ts/g, "")
+          .replace(/```js/g, "")
+          .replace(/```/g, "")
+          .trim();
+      }
+
+      setGeneratedCode(cleanCodeLocal(data.output));
       setGenerationId(data.id || "gen-" + Date.now());
       setGeneratedPrompt(prompt);
     } catch (error: any) {
