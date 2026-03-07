@@ -12,13 +12,13 @@ import { ChatEditor } from "./ChatEditor";
 
 interface PreviewCanvasProps {
     prompt: string;
-    generatedCode: string;
+    generatedFiles: Record<string, string>;
     generationId?: string;
     onRegenerate: () => void;
     onRegenerateStyle: (theme: string) => void;
 }
 
-export function PreviewCanvas({ prompt, generatedCode, generationId, onRegenerate, onRegenerateStyle }: PreviewCanvasProps) {
+export function PreviewCanvas({ prompt, generatedFiles, generationId, onRegenerate, onRegenerateStyle }: PreviewCanvasProps) {
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [showPricing, setShowPricing] = useState(false);
@@ -26,8 +26,8 @@ export function PreviewCanvas({ prompt, generatedCode, generationId, onRegenerat
     const [showShare, setShowShare] = useState(false);
     const { data: session } = useSession();
 
-    // Local code state updated by ChatEditor AI edits
-    const [localCode, setLocalCode] = useState<string>(generatedCode);
+    // Local code state updated by ChatEditor AI edits. Defaulting to Main App for single-file edits.
+    const [localCode, setLocalCode] = useState<string>(generatedFiles["/App.tsx"] || "");
     const [isEditing, setIsEditing] = useState(false);
 
     const handleChatEdit = async (promptMsg: string, currentCode: string) => {
@@ -51,11 +51,8 @@ export function PreviewCanvas({ prompt, generatedCode, generationId, onRegenerat
         }
     };
 
-    const sandpackFiles = {
-        "/App.tsx": {
-            code: localCode,
-            active: true
-        },
+    // Transform the Gemini JSON multi-file map into Sandpack's accepted internal virtual file state
+    const sandpackFiles: Record<string, any> = {
         "/public/index.html": {
             code: `<!DOCTYPE html>
 <html lang="en">
@@ -64,6 +61,7 @@ export function PreviewCanvas({ prompt, generatedCode, generationId, onRegenerat
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="root"></div>
@@ -71,6 +69,18 @@ export function PreviewCanvas({ prompt, generatedCode, generationId, onRegenerat
 </html>`
         }
     };
+
+    // Dynamically inject all AI-generated files
+    Object.entries(generatedFiles).forEach(([filePath, fileCode]) => {
+        // AI edits override the generated App file 
+        const isApp = filePath === "/App.tsx" || filePath === "App.tsx";
+        const targetPath = filePath.startsWith("/") ? filePath : `/${filePath}`;
+
+        sandpackFiles[targetPath] = {
+            code: isApp && localCode ? localCode : fileCode,
+            active: isApp
+        };
+    });
 
     const [showExportSuccess, setShowExportSuccess] = useState(false);
 

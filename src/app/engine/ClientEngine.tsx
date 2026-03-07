@@ -10,7 +10,7 @@ import { GenerationLoader } from "@/components/GenerationLoader";
 export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
-  const [generatedCode, setGeneratedCode] = useState<string | null>(null);
+  const [generatedFiles, setGeneratedFiles] = useState<Record<string, string> | null>(null);
   const [generationId, setGenerationId] = useState<string | null>(null);
 
   const handleGenerate = async (prompt: string) => {
@@ -48,18 +48,16 @@ export default function Home() {
         return;
       }
 
-      function cleanCodeLocal(codeText: string) {
-        if (!codeText) return "";
-        return codeText
-          .replace(/```tsx/g, "")
-          .replace(/```jsx/g, "")
-          .replace(/```ts/g, "")
-          .replace(/```js/g, "")
-          .replace(/```/g, "")
-          .trim();
+      let parsedFiles: Record<string, string> = {};
+      try {
+        const payload = JSON.parse(data.output);
+        parsedFiles = payload.files || payload;
+      } catch (e) {
+        console.error("Failed to parse JSON response payload:", data.output);
+        throw new Error("AI returned malformed JSON project structure.");
       }
 
-      setGeneratedCode(cleanCodeLocal(data.output));
+      setGeneratedFiles(parsedFiles);
       setGenerationId(data.id || "gen-" + Date.now());
       setGeneratedPrompt(prompt);
     } catch (error: any) {
@@ -72,7 +70,7 @@ export default function Home() {
 
   const handleRegenerate = () => {
     setGeneratedPrompt(null);
-    setGeneratedCode(null);
+    setGeneratedFiles(null);
     setGenerationId(null);
   };
 
@@ -82,7 +80,7 @@ export default function Home() {
   return (
     <main className="relative min-h-screen bg-black text-white flex flex-col items-center justify-center overflow-hidden">
       <AnimatePresence mode="wait">
-        {!generatedPrompt || !generatedCode ? (
+        {!generatedPrompt || !generatedFiles ? (
           <motion.div
             key="editor"
             initial={{ opacity: 0 }}
@@ -154,7 +152,7 @@ export default function Home() {
           <PreviewCanvas
             key="preview"
             prompt={generatedPrompt}
-            generatedCode={generatedCode}
+            generatedFiles={generatedFiles}
             generationId={generationId || undefined}
             onRegenerate={handleRegenerate}
             onRegenerateStyle={handleRegenerateStyle as any}
