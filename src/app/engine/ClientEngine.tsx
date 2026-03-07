@@ -24,20 +24,23 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        let errorMessage = "Generation failed";
+        let errorMessage = "";
         try {
           errorMessage = await response.text();
         } catch (e) { }
 
+        console.error("API ERROR:", errorMessage);
+
         if (response.status === 403) {
           alert(errorMessage || "Free limit reached. Upgrade to Pro.");
-          setIsGenerating(false);
-          return;
         } else if (response.status === 504) {
-          throw new Error("Vercel Timeout (504). The AI took too long to generate code. (maxDuration=60 was just added, please redeploy!)");
+          alert("Vercel Timeout (504). The AI took too long to generate code.");
+        } else {
+          alert(errorMessage || "API error occurred");
         }
 
-        throw new Error(errorMessage);
+        setIsGenerating(false);
+        return;
       }
 
       const data = await response.json();
@@ -61,8 +64,8 @@ export default function Home() {
       setGenerationId(data.id || "gen-" + Date.now());
       setGeneratedPrompt(prompt);
     } catch (error: any) {
-      console.error(error);
-      alert(`Uh oh! Generation engine failed to hook up.\n\nDetails: ${error.message || error}`);
+      console.error("FULL ERROR:", error);
+      alert(error?.message || "Unknown error occurred");
     } finally {
       setIsGenerating(false);
     }

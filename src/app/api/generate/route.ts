@@ -52,13 +52,9 @@ ${prompt}
       output: text,
     });
 
-  } catch (error) {
+  } catch (error: any) {
+    console.error("GEMINI ERROR:", error);
 
-    console.error("Gemini Error:", error);
-
-    return Response.json({
-      success: false,
-      error: "Generation engine failed to hook up",
-    });
+    return new Response(error.message, { status: 500 });
   }
 }
