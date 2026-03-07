@@ -44,6 +44,13 @@ export default function Home() {
       }
 
       const data = await response.json();
+
+      if (data.success === false) {
+        alert(data.error || "AI generation failed");
+        setIsGenerating(false);
+        return;
+      }
+
       setGeneratedCode(data.code);
       setGenerationId(data.id || "gen-" + Date.now());
       setGeneratedPrompt(prompt);

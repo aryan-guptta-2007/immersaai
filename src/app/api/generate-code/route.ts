@@ -46,17 +46,24 @@ export default function GeneratedSite() {
     const result = await model.generateContent(promptText);
     let text = result.response.text();
 
-    // Extra cleanup just in case Gemini disobeys the instruction and wraps in markdown
-    text = text.replace(/^```(tsx|jsx|js|ts|typescript|react)?\s*/i, "");
-    text = text.replace(/```\s*$/g, "");
-    text = text.trim();
+    function cleanCode(codeText: string) {
+      return codeText
+        .replace(/```tsx/g, "")
+        .replace(/```jsx/g, "")
+        .replace(/```ts/g, "")
+        .replace(/```js/g, "")
+        .replace(/```/g, "")
+        .trim();
+    }
 
-    return Response.json({ code: text });
+    text = cleanCode(text);
+
+    return Response.json({ success: true, code: text });
   } catch (error: any) {
     console.error("Gemini Generation Error:", error);
     return Response.json({
       success: false,
-      error: error.message || "Code generation compilation failed",
-    }, { status: 500 });
+      error: error.message || "AI generation failed",
+    });
   }
 }
