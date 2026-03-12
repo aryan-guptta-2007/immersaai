@@ -17,11 +17,17 @@ export default function Home() {
     setIsGenerating(true);
 
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000); // 20 sec
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeout);
 
       if (!response.ok) {
         let errorMessage = "";
@@ -78,7 +84,12 @@ export default function Home() {
       setGeneratedPrompt(prompt);
     } catch (error: any) {
       console.error("FULL ERROR:", error);
-      alert(error?.message || "Unknown error occurred");
+      
+      if (error.name === "AbortError") {
+        alert("Request timed out. The AI server did not respond.");
+      } else {
+        alert(error?.message || "Unknown error occurred");
+      }
     } finally {
       setIsGenerating(false);
     }
