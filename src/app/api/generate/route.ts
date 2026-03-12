@@ -22,7 +22,14 @@ export async function POST(req: Request) {
       model: "gemini-1.5-flash",
     });
 
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }]
+        }
+      ]
+    });
 
     const text = result.response.text();
 
