@@ -56,8 +56,21 @@ export default function Home() {
         const payload = JSON.parse(data.output);
         parsedFiles = payload.files || payload;
       } catch (e) {
-        console.error("Failed to parse JSON response payload:", data.output);
-        throw new Error("AI returned malformed JSON project structure.");
+        console.warn("API returned raw string instead of JSON, mapping to fallback layout:", e);
+        // Fallback for raw text responses from the simplified API
+        function cleanCodeLocal(codeText: string) {
+          if (!codeText) return "";
+          return codeText
+            .replace(/```tsx/g, "")
+            .replace(/```jsx/g, "")
+            .replace(/```ts/g, "")
+            .replace(/```js/g, "")
+            .replace(/```/g, "")
+            .trim();
+        }
+        parsedFiles = {
+          "/App.tsx": cleanCodeLocal(data.output)
+        };
       }
 
       setGeneratedFiles(parsedFiles);
