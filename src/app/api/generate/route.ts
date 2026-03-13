@@ -6,18 +6,29 @@ export async function POST(req: Request) {
   try {
     const { prompt } = await req.json();
 
+    if (!prompt) {
+      return Response.json({ success: false, error: "Prompt missing" }, { status: 400 });
+    }
+
     const ai = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY!,
     });
 
-    const result = await ai.models.generateContent({
+    const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
-      contents: prompt,
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ],
     });
+
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     return Response.json({
       success: true,
-      output: result.text,
+      output: text,
     });
 
   } catch (error: any) {
