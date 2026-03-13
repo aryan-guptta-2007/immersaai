@@ -16,27 +16,23 @@ export async function POST(req: Request) {
 
     const response = await ai.models.generateContent({
       model: "gemini-1.5-flash",
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
+      contents: prompt,
     });
-
-    const text = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     return Response.json({
       success: true,
-      output: text,
+      output: response.text,
     });
 
   } catch (error: any) {
     console.error("API ERROR:", error);
 
-    return Response.json({
-      success: false,
-      error: error.message,
-    }, { status: 500 });
+    return Response.json(
+      {
+        success: false,
+        error: error.message,
+      },
+      { status: 500 }
+    );
   }
 }
