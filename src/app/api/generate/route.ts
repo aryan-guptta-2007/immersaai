@@ -6,22 +6,18 @@ export async function POST(req: Request) {
   try {
     const { prompt } = await req.json();
 
-    if (!process.env.GEMINI_API_KEY) {
-      return Response.json({ error: "Missing Gemini API key" }, { status: 500 });
-    }
-
     const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY
+      apiKey: process.env.GEMINI_API_KEY!,
     });
 
     const result = await ai.models.generateContent({
-      model: "gemini-1.5-flash-latest",
-      contents: prompt
+      model: "gemini-1.5-flash",
+      contents: prompt,
     });
 
     return Response.json({
       success: true,
-      output: result.text
+      output: result.text,
     });
 
   } catch (error: any) {
@@ -29,7 +25,7 @@ export async function POST(req: Request) {
 
     return Response.json({
       success: false,
-      error: error.message
+      error: error.message,
     }, { status: 500 });
   }
 }
